@@ -47,7 +47,7 @@ export const CaseStudySection: React.FC = () => {
               {study.solution}
             </p>
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {study.technologies.map((t, idx) => (
+              {study.technologies.map((t: string, idx: number) => (
                 <span key={idx} className="px-2 py-0.5 rounded text-[11px] font-mono bg-obsidian text-text-soft border border-white/5">
                   {t}
                 </span>
@@ -63,7 +63,7 @@ export const CaseStudySection: React.FC = () => {
             <span>Implemented Features (From Resume)</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {study.features.map((feat, idx) => (
+            {study.features.map((feat: string, idx: number) => (
               <div key={idx} className="flex items-start gap-2.5 p-3 rounded-lg bg-obsidian/70 border border-white/5">
                 <CheckCircle2 className="w-4 h-4 text-electric-lime shrink-0 mt-0.5" />
                 <span className="font-inter text-xs sm:text-sm text-text-soft">{feat}</span>

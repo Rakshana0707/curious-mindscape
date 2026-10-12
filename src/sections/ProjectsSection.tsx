@@ -20,7 +20,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onOpenProjectM
 
   const filteredProjects = portfolioData.projects.filter((p) => {
     if (filter === 'all') return true;
-    return p.category === filter;
+    return (p.category as string) === filter || p.category.includes(filter);
   });
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { portfolioData } from '../data/portfolioData';
+import { portfolioData, TechnicalDomain } from '../data/portfolioData';
 import { TrackPathway } from '../components/TrackPathway';
 import { WorldCard } from '../components/WorldCard';
 
@@ -41,7 +41,7 @@ export const WorldsSection: React.FC = () => {
 
         {/* 4 Technical Domain Cards */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {portfolioData.domains.map((domain) => (
+          {portfolioData.domains.map((domain: TechnicalDomain) => (
             <WorldCard key={domain.id} world={domain} />
           ))}
         </div>

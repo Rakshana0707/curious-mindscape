@@ -9,27 +9,32 @@ interface ProjectCardProps {
 }
 
 export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpenDetails }) => {
-  const getBadgeStyle = (category: Project['category']) => {
+  const getBadgeStyle = (category: string) => {
     switch (category) {
       case 'systems':
+      case 'systems-hardware':
         return {
           bg: 'bg-electric-lime/10',
           text: 'text-electric-lime',
           border: 'border-electric-lime/30',
         };
       case 'ai':
+      case 'ai-civic':
         return {
           bg: 'bg-ice-blue/10',
           text: 'text-ice-blue',
           border: 'border-ice-blue/30',
         };
       case 'ml':
+      case 'behavioral-ml':
         return {
           bg: 'bg-accent-teal/10',
           text: 'text-accent-teal',
           border: 'border-accent-teal/30',
         };
       case 'fullstack':
+      case 'web-systems':
+      case 'collab-vital':
       default:
         return {
           bg: 'bg-accent-amber/10',
