@@ -90,7 +90,7 @@ export function App() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-4xl h-48 bg-amber-500/5 blur-[120px] pointer-events-none" />
 
       {/* Main Book Stage */}
-      <main className="flex-grow flex items-center justify-center pt-8 pb-20 px-2 sm:px-4">
+      <main className="flex-grow flex items-center justify-center pt-16 sm:pt-20 pb-20 px-2 sm:px-4">
         {currentSpread === 0 ? (
           /* Front Hardcover */
           <BookCover

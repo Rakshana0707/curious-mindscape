@@ -1,5 +1,5 @@
 import React from 'react';
-import { portfolioData, Project, BookChapter } from '../../data/portfolioData';
+import { portfolioData, Project, CaseStudy } from '../../data/portfolioData';
 import { ContactBookForm } from './ContactBookForm';
 import { 
   Award, 
@@ -8,13 +8,14 @@ import {
   Mail, 
   Phone, 
   ShieldCheck, 
-  BookOpen, 
   ChevronRight, 
   Sparkles,
   MapPin,
-  Calendar,
   CheckCircle2,
-  FileText
+  FileText,
+  Lightbulb,
+  AlertTriangle,
+  ArrowRight
 } from 'lucide-react';
 import { GitHubIcon, LinkedInIcon } from '../BrandIcons';
 
@@ -40,61 +41,199 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   const leftPageNum = spreadIndex * 2 - 1;
   const rightPageNum = spreadIndex * 2;
 
-  // Find current chapter info
+  // Chapter metadata
   const chapter = portfolioData.chapters.find(c => c.spreadIndex === spreadIndex) || portfolioData.chapters[0];
 
-  // Helper for rendering project cards inside book pages
-  const renderProjectCard = (project: Project) => (
-    <div 
-      onClick={() => onOpenProjectModal(project)}
-      className="bg-white/80 hover:bg-white rounded-lg border border-amber-900/15 hover:border-amber-900/40 p-4 shadow-sm hover:shadow-md transition-all cursor-pointer group mb-4"
-    >
-      <div className="flex items-start justify-between gap-2 mb-1.5">
+  // Helper for rendering project cards inside project chapters
+  const renderProjectPage = (project: Project) => (
+    <div className="space-y-3.5">
+      <div className="flex items-start justify-between gap-2 border-b border-amber-900/15 pb-2">
         <div>
-          <span className="text-[10px] font-cinzel font-bold text-amber-900 tracking-wider">
-            {project.chapterRoman !== '—' ? `CH. ${project.chapterRoman} • ` : ''}PROJECT
+          <span className="text-[10px] font-cinzel font-bold text-amber-900 uppercase tracking-widest">
+            {project.chapterRoman !== '—' ? `Chapter ${project.chapterRoman} • ` : ''}{project.categoryLabel}
           </span>
-          <h4 className="font-cinzel font-bold text-base text-stone-900 group-hover:text-amber-950 flex items-center gap-1.5">
+          <h3 className="font-cinzel font-bold text-lg sm:text-xl text-stone-900 flex items-center gap-2">
             <span>{project.title}</span>
             <span className="text-[10px] font-mono font-normal text-stone-500">[{project.sourcePdf}]</span>
-          </h4>
+          </h3>
+          <p className="text-xs font-garamond italic text-stone-600">
+            {project.subtitle}
+          </p>
         </div>
-        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-stone-100 text-stone-700 border border-stone-200 shrink-0">
+        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 font-semibold shrink-0">
           p. {project.pageNumber}
         </span>
       </div>
 
-      <p className="text-xs font-garamond italic text-stone-600 mb-2">
-        {project.subtitle}
-      </p>
-
-      {/* Tech Tags */}
-      <div className="flex flex-wrap gap-1 mb-2.5">
-        {project.technologies.slice(0, 5).map(tech => (
-          <span key={tech} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-stone-100 text-stone-700 border border-stone-200">
+      {/* Tech tags */}
+      <div className="flex flex-wrap gap-1">
+        {project.technologies.map(tech => (
+          <span key={tech} className="px-2 py-0.5 rounded text-[10px] font-mono bg-stone-100 text-stone-800 border border-stone-200">
             {tech}
           </span>
         ))}
       </div>
 
-      <p className="text-xs font-serif text-stone-800 line-clamp-3 leading-relaxed mb-3">
-        {project.description}
-      </p>
-
-      {/* Metrics Badges */}
-      {project.metrics && project.metrics.length > 0 && (
-        <div className="pt-2 border-t border-amber-900/10 flex flex-wrap gap-1.5">
-          {project.metrics.map(metric => (
-            <span key={metric} className="text-[10px] font-mono text-amber-950 bg-amber-50 px-2 py-0.5 rounded border border-amber-900/10">
-              ✓ {metric}
-            </span>
-          ))}
+      {/* Problem & Solution */}
+      <div className="space-y-2 text-xs font-serif leading-relaxed">
+        <div className="p-2.5 bg-white/70 rounded border border-amber-900/10">
+          <strong className="font-cinzel text-amber-950 block text-[11px] mb-0.5">Problem Addressed:</strong>
+          <p className="text-stone-700">{project.problem}</p>
         </div>
-      )}
 
-      <div className="mt-2.5 flex items-center justify-between text-[11px] font-cinzel font-semibold text-amber-900 group-hover:text-amber-950">
-        <span>INSPECT SPECIFICATIONS</span>
-        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+        <div className="p-2.5 bg-white/70 rounded border border-amber-900/10">
+          <strong className="font-cinzel text-emerald-950 block text-[11px] mb-0.5">Solution Implemented:</strong>
+          <p className="text-stone-700">{project.solution}</p>
+        </div>
+      </div>
+
+      {/* Contribution & Decisions */}
+      <div className="p-2.5 bg-amber-50/50 rounded border border-amber-900/10 text-xs font-serif space-y-1.5">
+        <div>
+          <strong className="font-cinzel text-amber-950 block text-[11px]">Documented Contribution:</strong>
+          <p className="text-stone-700 text-[11px] leading-relaxed">{project.contribution}</p>
+        </div>
+        {project.technicalDecisions && project.technicalDecisions.length > 0 && (
+          <div>
+            <strong className="font-cinzel text-amber-950 block text-[11px]">Key Technical Decisions:</strong>
+            <ul className="list-disc list-inside text-[11px] text-stone-700 space-y-0.5">
+              {project.technicalDecisions.map((dec, i) => (
+                <li key={i}>{dec}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Implementation bullets & Verified Metrics */}
+      <div className="space-y-1.5 pt-1">
+        <strong className="font-cinzel text-[10px] uppercase tracking-wider text-amber-900 block">
+          Verified Implementation & Benchmarks:
+        </strong>
+        {project.metrics && (
+          <div className="flex flex-wrap gap-1.5">
+            {project.metrics.map(m => (
+              <span key={m} className="px-2 py-0.5 rounded text-[10px] font-mono bg-stone-100 text-stone-800 border border-stone-200">
+                ✓ {m}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="pt-2 border-t border-amber-900/15 flex items-center justify-between text-xs">
+        <span className="font-mono text-[10px] text-emerald-800 font-medium">
+          Status: {project.status}
+        </span>
+        <button
+          onClick={() => onOpenProjectModal(project)}
+          className="font-cinzel text-xs font-semibold text-amber-900 hover:text-amber-950 flex items-center gap-1 cursor-pointer"
+        >
+          <span>Deep-Dive Specs</span>
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+
+  // Helper for rendering structured 6-section case studies
+  const renderCaseStudyPage = (study: CaseStudy) => (
+    <div className="space-y-3">
+      <div className="border-b border-amber-900/15 pb-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-cinzel font-bold text-amber-900 uppercase tracking-widest">
+            FEATURED CASE STUDY
+          </span>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-semibold border border-amber-300">
+            p. {study.pageNumber}
+          </span>
+        </div>
+        <h3 className="font-cinzel font-bold text-base sm:text-lg text-stone-900 mt-0.5">
+          {study.title}
+        </h3>
+        <p className="text-xs font-garamond italic text-stone-600">
+          {study.subtitle}
+        </p>
+      </div>
+
+      {/* 1. Problem */}
+      <div className="p-2.5 bg-white/70 rounded border border-amber-900/10 text-xs font-serif">
+        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-0.5">
+          1. Problem Statement
+        </span>
+        <p className="text-stone-700 leading-relaxed">{study.problem}</p>
+      </div>
+
+      {/* 2. Requirements and Constraints */}
+      <div className="p-2.5 bg-white/70 rounded border border-amber-900/10 text-xs font-serif">
+        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-1">
+          2. Requirements & Constraints
+        </span>
+        <ul className="space-y-1 text-[11px] text-stone-700">
+          {study.requirementsAndConstraints.map((rc, idx) => (
+            <li key={idx} className="flex items-start gap-1.5">
+              <span className="text-amber-800 font-bold shrink-0">•</span>
+              <span>{rc}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 3. Approach and Design Decisions */}
+      <div className="p-2.5 bg-white/70 rounded border border-amber-900/10 text-xs font-serif">
+        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-1">
+          3. Approach & Design Decisions
+        </span>
+        <ul className="space-y-1 text-[11px] text-stone-700">
+          {study.approachAndDecisions.map((ad, idx) => (
+            <li key={idx} className="flex items-start gap-1.5">
+              <span className="text-amber-800 font-bold shrink-0">❖</span>
+              <span>{ad}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 4. Implementation */}
+      <div className="p-2.5 bg-white/70 rounded border border-amber-900/10 text-xs font-serif">
+        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-1">
+          4. Technical Implementation
+        </span>
+        <ul className="space-y-1 text-[11px] text-stone-700">
+          {study.implementation.map((imp, idx) => (
+            <li key={idx} className="flex items-start gap-1.5">
+              <span className="text-amber-800 font-bold shrink-0">→</span>
+              <span>{imp}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 5. Verified Outcome */}
+      <div className="p-2.5 bg-emerald-50/70 rounded border border-emerald-800/20 text-xs font-serif">
+        <span className="font-cinzel font-bold text-emerald-950 block text-[11px] mb-1 flex items-center gap-1">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+          <span>5. Verified Outcome</span>
+        </span>
+        <ul className="space-y-1 text-[11px] text-emerald-900">
+          {study.verifiedOutcome.map((vo, idx) => (
+            <li key={idx}>✓ {vo}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* 6. Potential Future Improvements (clearly distinguished) */}
+      <div className="p-2.5 bg-amber-50/70 rounded border border-amber-800/20 text-xs font-serif">
+        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-1 flex items-center gap-1">
+          <Lightbulb className="w-3.5 h-3.5 text-amber-700" />
+          <span>6. Potential Future Improvements (Roadmap)</span>
+        </span>
+        <ul className="space-y-1 text-[11px] text-stone-700 italic">
+          {study.futureImprovements.map((fi, idx) => (
+            <li key={idx}>• {fi}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );
@@ -102,7 +241,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   return (
     <div className="w-full max-w-6xl mx-auto p-2 sm:p-6 lg:p-8 flex items-center justify-center">
       {/* Book Spread Outer Container with 3D Depth & Page Stack */}
-      <div className="relative w-full bg-book-paper text-book-ink rounded-lg shadow-2xl border-t border-b border-amber-950/20 book-shadow-cast flex flex-col md:flex-row overflow-hidden min-h-[720px] lg:min-h-[780px]">
+      <div className="relative w-full bg-book-paper text-book-ink rounded-lg shadow-2xl border-t border-b border-amber-950/20 book-shadow-cast flex flex-col md:flex-row overflow-hidden min-h-[740px] lg:min-h-[800px]">
         
         {/* =========================================================================
             LEFT PAGE (VERSO)
@@ -113,23 +252,24 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
           <div className="absolute inset-y-0 right-0 w-16 page-verso-shadow hidden md:block" />
 
           {/* Left Page Running Header */}
-          <div className="flex items-center justify-between pb-3 mb-5 border-b border-amber-900/20 text-xs font-cinzel text-amber-900 tracking-[0.2em] uppercase select-none">
+          <div className="flex items-center justify-between pb-3 mb-4 border-b border-amber-900/20 text-xs font-cinzel text-amber-900 tracking-[0.2em] uppercase select-none">
             <span>THE CURIOUS MINDSCAPE</span>
-            <span className="font-mono text-stone-500">VOL. I</span>
+            <span className="font-mono text-stone-500">SECTION {spreadIndex}</span>
           </div>
 
           {/* Left Page Content per Spread */}
           <div className="flex-grow book-scroll overflow-y-auto pr-1">
             {spreadIndex === 1 && (
               /* Spread 1: Left Page - Frontispiece & Edition Colophon */
-              <div className="space-y-6 text-center py-4">
+              <div className="space-y-6 text-center py-2">
                 <div className="border border-amber-900/20 p-6 rounded bg-stone-50/50 relative">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 bg-book-paper font-cinzel text-[10px] tracking-widest text-amber-900 uppercase">
                     FRONTISPIECE
                   </div>
 
-                  <div className="w-20 h-20 mx-auto rounded-full border-2 border-amber-800/40 flex items-center justify-center bg-amber-950/5 my-2">
-                    <span className="font-cinzel text-2xl font-bold text-amber-950 tracking-wider">SRR</span>
+                  {/* Monogram Seal / Photograph Slot */}
+                  <div className="w-24 h-24 mx-auto rounded-full border-2 border-amber-800/40 flex items-center justify-center bg-amber-950/5 my-2 shadow-inner">
+                    <span className="font-cinzel text-3xl font-bold text-amber-950 tracking-wider">SRR</span>
                   </div>
 
                   <h2 className="font-cinzel font-extrabold text-2xl text-stone-900 tracking-wide mt-2">
@@ -148,7 +288,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
 
                   <div className="space-y-2 text-xs font-serif text-stone-700 text-left bg-white/70 p-4 rounded border border-amber-900/10">
                     <p className="font-mono text-[10px] uppercase tracking-wider text-amber-900 font-bold">
-                      ACADEMIC & SYSTEMS MONOGRAPH
+                      ACADEMIC & SYSTEMS MONOGRAPH • 2024–PRESENT
                     </p>
                     <p>
                       Composed in Coimbatore, India. Transcribed strictly from certified institutional curricula and verified academic project repositories.
@@ -185,7 +325,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
             )}
 
             {spreadIndex === 2 && (
-              /* Spread 2: Left Page - Table of Contents */
+              /* Spread 2: Left Page - Table of Contents Overview */
               <div className="space-y-4">
                 <div className="text-center pb-2 mb-3 border-b border-amber-900/15">
                   <span className="text-[10px] font-cinzel tracking-[0.25em] text-amber-900 uppercase">
@@ -196,7 +336,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                   </h3>
                 </div>
 
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   {portfolioData.chapters.map(ch => (
                     <div
                       key={ch.id}
@@ -220,7 +360,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                 </div>
 
                 <div className="mt-4 p-3 bg-amber-50/60 rounded border border-amber-900/10 text-xs font-garamond italic text-stone-700">
-                  Tip: Use left and right keyboard arrow keys or click the page edges to turn pages smoothly.
+                  Tip: Use the top <strong>CONTENTS</strong> button or arrow keys anytime to jump between chapters.
                 </div>
               </div>
             )}
@@ -228,75 +368,35 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
             {spreadIndex === 3 && (
               /* Spread 3: Left Page - Chapter I: GlobalPulse */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER I • WEB & INTELLIGENCE SYSTEMS
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    GlobalPulse Dashboard
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'globalpulse')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'globalpulse')!)}
               </div>
             )}
 
             {spreadIndex === 4 && (
               /* Spread 4: Left Page - Chapter II: Zyatra */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER II • AI, TOURISM & CIVIC PLATFORMS
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    Zyatra Heritage Suite
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'zyatra')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'zyatra')!)}
               </div>
             )}
 
             {spreadIndex === 5 && (
               /* Spread 5: Left Page - Chapter III: ContextIQ */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER III • BEHAVIORAL ML & TIME INTELLIGENCE
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    ContextIQ Architecture
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'contextiq')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'contextiq')!)}
               </div>
             )}
 
             {spreadIndex === 6 && (
               /* Spread 6: Left Page - Chapter IV: SkillSync */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER IV • COLLABORATIVE AI & VITAL PLATFORMS
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    SkillSync Platform
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'skillsync')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'skillsync')!)}
               </div>
             )}
 
             {spreadIndex === 7 && (
-              /* Spread 7: Left Page - Chapter V: Spotlight: Grainly */
+              /* Spread 7: Left Page - Chapter V: Featured Case Study 1: Grainly */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER V • HARDWARE & IPC SPOTLIGHT
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    Grainly Multi-Tiered Engine
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'grainly')!)}
+                {renderCaseStudyPage(portfolioData.caseStudies[0])}
               </div>
             )}
 
@@ -354,69 +454,75 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
             )}
 
             {spreadIndex === 9 && (
-              /* Spread 9: Left Page - Chapter VII: Official Coordinates & Resume Repository */
+              /* Spread 9: Left Page - Chapter VII: Final Contact Closing Message & Coordinates */
               <div className="space-y-4">
-                <div className="mb-3">
+                <div className="mb-2">
                   <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER VII • VERIFICATION & DISPATCH
+                    CHAPTER VII • FINAL CONTACT SPREAD
                   </span>
                   <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    Official Coordinates
+                    Closing Message & Coordinates
                   </h3>
                 </div>
 
                 <div className="p-4 bg-white/80 rounded border border-amber-900/15 space-y-3 text-xs font-serif text-stone-800">
-                  <div className="space-y-1">
-                    <h4 className="font-cinzel font-bold text-stone-900 text-sm">
-                      {portfolioData.personal.name}
-                    </h4>
-                    <p className="text-stone-600 font-garamond italic">
-                      Integrated MSc Software Systems • CIT
-                    </p>
-                    <p className="text-[11px] font-mono text-stone-500 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-amber-800" />
-                      <span>{portfolioData.personal.location}</span>
-                    </p>
-                  </div>
+                  <p className="font-garamond italic text-sm text-stone-700 leading-relaxed">
+                    "{portfolioData.personal.closingMessage}"
+                  </p>
 
-                  <div className="pt-2 border-t border-amber-900/10 space-y-2">
-                    <a
-                      href={`mailto:${portfolioData.personal.email}`}
-                      className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
-                    >
-                      <Mail className="w-3.5 h-3.5 text-amber-800" />
-                      <span>{portfolioData.personal.email}</span>
-                    </a>
+                  <div className="pt-3 border-t border-amber-900/10 space-y-2">
+                    <div className="space-y-0.5">
+                      <h4 className="font-cinzel font-bold text-stone-900 text-sm">
+                        {portfolioData.personal.name}
+                      </h4>
+                      <p className="text-stone-600 font-serif">
+                        Integrated MSc Software Systems • CIT
+                      </p>
+                      <p className="text-[11px] font-mono text-stone-500 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-amber-800" />
+                        <span>{portfolioData.personal.location}</span>
+                      </p>
+                    </div>
 
-                    <a
-                      href={`tel:${portfolioData.personal.phone.replace(/\s+/g, '')}`}
-                      className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
-                    >
-                      <Phone className="w-3.5 h-3.5 text-amber-800" />
-                      <span>{portfolioData.personal.phone}</span>
-                    </a>
+                    <div className="pt-2 space-y-2">
+                      <a
+                        href={`mailto:${portfolioData.personal.email}`}
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5 text-amber-800" />
+                        <span>{portfolioData.personal.email}</span>
+                      </a>
 
-                    <a
-                      href={portfolioData.personal.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
-                    >
-                      <GitHubIcon className="w-3.5 h-3.5 text-amber-800" />
-                      <span>github.com/Rakshana0707</span>
-                      <ExternalLink className="w-3 h-3 text-stone-400" />
-                    </a>
+                      <a
+                        href={`tel:${portfolioData.personal.phone.replace(/\s+/g, '')}`}
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                      >
+                        <Phone className="w-3.5 h-3.5 text-amber-800" />
+                        <span>{portfolioData.personal.phone}</span>
+                      </a>
 
-                    <a
-                      href={portfolioData.personal.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
-                    >
-                      <LinkedInIcon className="w-3.5 h-3.5 text-amber-800" />
-                      <span>linkedin.com/in/shiv-rakshana-ravikumar</span>
-                      <ExternalLink className="w-3 h-3 text-stone-400" />
-                    </a>
+                      <a
+                        href={portfolioData.personal.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                      >
+                        <GitHubIcon className="w-3.5 h-3.5 text-amber-800" />
+                        <span>github.com/Rakshana0707</span>
+                        <ExternalLink className="w-3 h-3 text-stone-400" />
+                      </a>
+
+                      <a
+                        href={portfolioData.personal.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                      >
+                        <LinkedInIcon className="w-3.5 h-3.5 text-amber-800" />
+                        <span>linkedin.com/in/shiv-rakshana-ravikumar</span>
+                        <ExternalLink className="w-3 h-3 text-stone-400" />
+                      </a>
+                    </div>
                   </div>
                 </div>
 
@@ -469,22 +575,22 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
           <div className="absolute inset-y-0 left-0 w-16 page-recto-shadow hidden md:block" />
 
           {/* Right Page Running Header */}
-          <div className="flex items-center justify-between pb-3 mb-5 border-b border-amber-900/20 text-xs font-cinzel text-amber-900 tracking-[0.2em] uppercase select-none">
-            <span className="font-mono text-stone-500">SECTION {spreadIndex}</span>
+          <div className="flex items-center justify-between pb-3 mb-4 border-b border-amber-900/20 text-xs font-cinzel text-amber-900 tracking-[0.2em] uppercase select-none">
+            <span className="font-mono text-stone-500">PAGE {rightPageNum}</span>
             <span>{chapter.title}</span>
           </div>
 
           {/* Right Page Content per Spread */}
           <div className="flex-grow book-scroll overflow-y-auto pl-1">
             {spreadIndex === 1 && (
-              /* Spread 1: Right Page - Executive Summary & Education */
+              /* Spread 1: Right Page - Synopsis & Education */
               <div className="space-y-5">
                 <div>
                   <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    EXECUTIVE SUMMARY
+                    SYNOPSIS
                   </span>
                   <h3 className="font-cinzel text-xl font-bold text-stone-900 mb-2">
-                    Professional Profile
+                    Professional Introduction
                   </h3>
                   <div className="text-xs sm:text-sm font-serif text-stone-800 leading-relaxed text-justify">
                     <span className="drop-cap">S</span>
@@ -615,103 +721,35 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
             {spreadIndex === 3 && (
               /* Spread 3: Right Page - Chapter I: CampCon */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER I • WEB & INTELLIGENCE SYSTEMS
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    CampCon Platform
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'campcon')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'campcon')!)}
               </div>
             )}
 
             {spreadIndex === 4 && (
               /* Spread 4: Right Page - Chapter II: CivicLensTN */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER II • AI, TOURISM & CIVIC PLATFORMS
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    CivicLensTN Accountability
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'civiclenstn')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'civiclenstn')!)}
               </div>
             )}
 
             {spreadIndex === 5 && (
               /* Spread 5: Right Page - Chapter III: MicroDelay */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER III • BEHAVIORAL ML & TIME INTELLIGENCE
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    MicroDelay Estimation
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'microdelay')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'microdelay')!)}
               </div>
             )}
 
             {spreadIndex === 6 && (
               /* Spread 6: Right Page - Chapter IV: LifeLink */
               <div>
-                <div className="mb-4">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER IV • COLLABORATIVE AI & VITAL PLATFORMS
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    LifeLink Network
-                  </h3>
-                </div>
-                {renderProjectCard(portfolioData.projects.find(p => p.id === 'lifelink')!)}
+                {renderProjectPage(portfolioData.projects.find(p => p.id === 'lifelink')!)}
               </div>
             )}
 
             {spreadIndex === 7 && (
-              /* Spread 7: Right Page - Chapter V: Methodology & IPC */
-              <div className="space-y-4">
-                <div className="mb-3">
-                  <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER V • ARCHITECTURAL METHODOLOGY
-                  </span>
-                  <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    Engineering Rigor & Verification
-                  </h3>
-                </div>
-
-                <div className="space-y-3 text-xs font-serif text-stone-800 leading-relaxed">
-                  <div className="p-3 bg-white/70 rounded border border-amber-900/15">
-                    <h5 className="font-cinzel font-bold text-stone-900 mb-1">
-                      1. Cross-Era Hardware / Web Bridge
-                    </h5>
-                    <p className="text-stone-700">
-                      Engineering solutions that integrate low-level assembly execution with high-level modern web frameworks, handling file locks, synchronization latency, and execution sandboxing in DOSBox.
-                    </p>
-                  </div>
-
-                  <div className="p-3 bg-white/70 rounded border border-amber-900/15">
-                    <h5 className="font-cinzel font-bold text-stone-900 mb-1">
-                      2. Data Integrity & Verification Pipelines
-                    </h5>
-                    <p className="text-stone-700">
-                      Developing multilingual NLP models to correlate published budgetary records against spoken and written public promises, establishing reproducible accountability metrics.
-                    </p>
-                  </div>
-
-                  <div className="p-3 bg-white/70 rounded border border-amber-900/15">
-                    <h5 className="font-cinzel font-bold text-stone-900 mb-1">
-                      3. Personalized Machine Learning Regressors
-                    </h5>
-                    <p className="text-stone-700">
-                      Trained individualized Random Forest models (e.g. MicroDelay) that achieve measurable ~10% reduction in prediction error compared to static population averages.
-                    </p>
-                  </div>
-                </div>
+              /* Spread 7: Right Page - Chapter V: Featured Case Study 2: MicroDelay */
+              <div>
+                {renderCaseStudyPage(portfolioData.caseStudies[1])}
               </div>
             )}
 
@@ -771,12 +809,12 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
             {spreadIndex === 9 && (
               /* Spread 9: Right Page - Chapter VII: Working Contact Form */
               <div>
-                <div className="mb-3">
+                <div className="mb-2">
                   <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                    CHAPTER VII • CORRESPONDENCE TERMINAL
+                    CORRESPONDENCE TERMINAL
                   </span>
                   <h3 className="font-cinzel text-xl font-bold text-stone-900">
-                    Direct Communication
+                    Direct Email Dispatch
                   </h3>
                 </div>
                 <ContactBookForm />
