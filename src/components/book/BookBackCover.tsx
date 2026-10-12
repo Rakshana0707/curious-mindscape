@@ -1,6 +1,6 @@
 import React from 'react';
 import { portfolioData } from '../../data/portfolioData';
-import { BookOpen, RotateCcw, Mail, Phone, ExternalLink, QrCode } from 'lucide-react';
+import { BookOpen, RotateCcw, Mail, Phone, ExternalLink } from 'lucide-react';
 import { GitHubIcon, LinkedInIcon } from '../BrandIcons';
 
 interface BookBackCoverProps {
@@ -52,7 +52,7 @@ export const BookBackCover: React.FC<BookBackCoverProps> = ({
             </div>
 
             {/* Colophon & Verification Stamp */}
-            <div className="my-5 w-full flex flex-col sm:flex-row items-center justify-between gap-4 p-3 bg-zinc-900/60 rounded border border-zinc-700/60 text-left">
+            <div className="my-5 w-full p-4 bg-zinc-900/60 rounded border border-zinc-700/60 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-[10px] font-mono uppercase tracking-wider text-amber-300 font-semibold">
                   Coimbatore Institute of Technology
@@ -65,10 +65,9 @@ export const BookBackCover: React.FC<BookBackCoverProps> = ({
                 </p>
               </div>
 
-              {/* Barcode / Live QR representation */}
-              <div className="flex flex-col items-center gap-1 bg-white p-2 rounded shadow text-stone-900 text-center shrink-0">
-                <QrCode className="w-14 h-14 text-stone-900" />
-                <span className="text-[8px] font-mono font-bold tracking-tight">VERCEL LIVE</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded bg-amber-950/40 border border-amber-400/30 text-amber-200 text-xs font-mono shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>Verified Credentials</span>
               </div>
             </div>
 
