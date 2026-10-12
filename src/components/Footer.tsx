@@ -16,7 +16,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuditModal }) => {
     <footer className="border-t border-graphite-border bg-obsidian-deep py-12 relative text-text-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 pb-10 border-b border-white/5">
-          {/* Left: Brand & Coordinates */}
+          {/* Left: Brand & Institution */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-electric-lime" />
@@ -25,7 +25,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuditModal }) => {
               </h3>
             </div>
             <p className="font-mono text-xs text-text-muted">
-              Designed & Engineered for {portfolioData.personal.name}
+              {portfolioData.personal.name} · {portfolioData.personal.title}
             </p>
             <div className="flex items-center gap-2 font-mono text-[11px] text-text-subtle">
               <Compass className="w-3.5 h-3.5 text-electric-lime" />
@@ -33,15 +33,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuditModal }) => {
             </div>
           </div>
 
-          {/* Center: Four Dimensions Links */}
+          {/* Center: Four Technical Domains Links */}
           <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
-            <a href="#world-read" className="text-ice-blue hover:underline">01. READ</a>
+            <a href="#domain-swe" className="text-ice-blue hover:underline">01. DEV</a>
             <span className="text-white/20">/</span>
-            <a href="#world-create" className="text-accent-amber hover:underline">02. CREATE</a>
+            <a href="#domain-systems" className="text-accent-amber hover:underline">02. ARCH</a>
             <span className="text-white/20">/</span>
-            <a href="#world-listen" className="text-accent-teal hover:underline">03. LISTEN</a>
+            <a href="#domain-aiml" className="text-accent-teal hover:underline">03. AI/ML</a>
             <span className="text-white/20">/</span>
-            <a href="#world-build" className="text-electric-lime hover:underline">04. BUILD</a>
+            <a href="#domain-fullstack" className="text-electric-lime hover:underline">04. SYS</a>
           </div>
 
           {/* Right: Quick Links & Back to Top */}
@@ -50,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuditModal }) => {
               onClick={onOpenAuditModal}
               className="px-3 py-1.5 rounded-md text-xs font-mono text-ice-blue bg-graphite border border-ice-blue/30 hover:border-ice-blue transition-colors"
             >
-              PDF Data Audit
+              Resume Audit
             </button>
 
             <button
@@ -67,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAuditModal }) => {
         {/* Bottom copyright & attribution */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-text-subtle">
           <div>
-            © {new Date().getFullYear()} Shiv Rakshana R. All personal and academic data extracted from primary records.
+            © {new Date().getFullYear()} Shiv Rakshana R. Software Systems · Coimbatore Institute of Technology.
           </div>
           <div className="flex items-center gap-4">
             <a href={`mailto:${portfolioData.personal.email}`} className="hover:text-electric-lime transition-colors">

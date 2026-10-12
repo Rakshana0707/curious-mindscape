@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { X, CheckCircle2, Cpu } from 'lucide-react';
+import { X, CheckCircle2, Cpu, AlertCircle } from 'lucide-react';
 import { Project } from '../data/portfolioData';
+import { GitHubIcon } from './BrandIcons';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -55,9 +56,12 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
           <h2 id="modal-project-title" className="font-grotesk font-bold text-2xl sm:text-3xl text-text-soft">
             {project.title}
           </h2>
+          <p className="font-inter text-sm text-text-muted mt-1">
+            {project.description}
+          </p>
         </div>
 
-        {/* Tech Stack Pills */}
+        {/* Tech Stack */}
         <div className="flex flex-wrap gap-2 mt-4">
           {project.technologies.map((t, idx) => (
             <span
@@ -70,20 +74,29 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
           ))}
         </div>
 
-        {/* Content */}
+        {/* Content: Problem & Solution */}
         <div className="mt-6 space-y-4 text-sm font-inter">
           <div>
-            <h4 className="font-mono text-xs uppercase tracking-wider text-text-muted font-semibold mb-2">
-              Project Description
+            <h4 className="font-mono text-xs uppercase tracking-wider text-accent-amber font-semibold mb-2">
+              Problem Addressed
             </h4>
             <p className="text-text-soft leading-relaxed bg-obsidian/60 p-4 rounded-xl border border-white/5">
-              {project.description}
+              {project.problem}
+            </p>
+          </div>
+
+          <div>
+            <h4 className="font-mono text-xs uppercase tracking-wider text-electric-lime font-semibold mb-2">
+              Solution Implemented
+            </h4>
+            <p className="text-text-soft leading-relaxed bg-obsidian/60 p-4 rounded-xl border border-white/5">
+              {project.solution}
             </p>
           </div>
 
           <div>
             <h4 className="font-mono text-xs uppercase tracking-wider text-text-muted font-semibold mb-2">
-              Key Technical Implementations (From Resume)
+              Verified Technical Details (From Resume)
             </h4>
             <div className="space-y-2">
               {project.bullets.map((b, idx) => (
@@ -97,7 +110,19 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ project,
         </div>
 
         {/* Footer */}
-        <div className="mt-6 pt-4 border-t border-white/10 flex justify-end">
+        <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+          {project.githubUrl ? (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs font-mono text-text-soft hover:text-electric-lime transition-colors"
+            >
+              <GitHubIcon className="w-4 h-4" />
+              <span>View GitHub Repository</span>
+            </a>
+          ) : <div />}
+
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-lg text-xs font-mono font-medium text-obsidian bg-electric-lime hover:bg-electric-lime-dim transition-colors"

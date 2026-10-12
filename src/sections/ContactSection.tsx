@@ -214,7 +214,7 @@ export const ContactSection: React.FC = () => {
                     <option value="Software Engineering Internship">Software Engineering Internship</option>
                     <option value="Data & ML Engineering Opportunity">Data & ML Engineering Opportunity</option>
                     <option value="Project Collaboration">Project Collaboration</option>
-                    <option value="General Conversation">Books, Gastronomy, or Music Exploration</option>
+                    <option value="General Technical Discussion">General Technical Discussion</option>
                   </select>
                 </div>
 

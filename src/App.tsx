@@ -17,7 +17,7 @@ export function App() {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
   const handleExploreClick = () => {
-    const el = document.getElementById('worlds');
+    const el = document.getElementById('domains');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -30,25 +30,25 @@ export function App() {
 
       {/* Main Sections */}
       <main className="flex-grow">
-        {/* Section 2: Hero */}
+        {/* Section: Hero */}
         <HeroSection onExploreClick={handleExploreClick} />
 
-        {/* Section 3: The Four Interests */}
+        {/* Section: Technical Domains */}
         <WorldsSection />
 
-        {/* Section 4: Selected Projects */}
+        {/* Section: Selected Academic Projects */}
         <ProjectsSection onOpenProjectModal={(project) => setSelectedProject(project)} />
 
-        {/* Section 6: Project Spotlight */}
+        {/* Section: Project Spotlight */}
         <CaseStudySection />
 
-        {/* Section 5: About Me & Education */}
+        {/* Section: About Me & Education */}
         <AboutSection />
 
-        {/* Section 7: Experience, Achievements & Skills */}
+        {/* Section: Experience, Achievements & Skills */}
         <ExperienceSection />
 
-        {/* Section 9: Contact */}
+        {/* Section: Contact */}
         <ContactSection />
       </main>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDown, Compass, Terminal, BookOpen, Utensils, Headphones, ArrowUpRight, Mail } from 'lucide-react';
+import { ArrowDown, Compass, Code, Cpu, Database, Server, Mail } from 'lucide-react';
 import { portfolioData } from '../data/portfolioData';
 import { AudioAtmosphere } from '../components/AudioAtmosphere';
 
@@ -10,7 +10,7 @@ interface HeroSectionProps {
 export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
   return (
     <section id="hero" className="relative min-h-screen pt-28 pb-16 flex flex-col justify-center overflow-hidden bg-mindscape-grid">
-      {/* Background radial ambient lights */}
+      {/* Background ambient lighting */}
       <div className="glow-orb top-10 left-1/4 w-[500px] h-[500px] bg-electric-lime" />
       <div className="glow-orb bottom-10 right-1/4 w-[500px] h-[500px] bg-ice-blue" />
       <div className="glow-orb top-1/2 left-2/3 w-[400px] h-[400px] bg-accent-amber" />
@@ -27,12 +27,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Hero Narrative */}
           <div className="lg:col-span-7 space-y-6">
-            <h1 className="font-grotesk font-bold text-4xl sm:text-6xl xl:text-7xl tracking-tight text-text-soft leading-[1.08]">
-              Books. Food. <br />
+            <h1 className="font-grotesk font-bold text-4xl sm:text-6xl xl:text-6xl tracking-tight text-text-soft leading-[1.1]">
+              Engineering Solutions. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-ice-blue via-accent-amber to-electric-lime">
-                Music.
+                Analyzing Systems.
               </span>{' '}
-              Technology.
+              Building Better Software.
             </h1>
 
             <p className="font-inter text-lg sm:text-xl text-text-muted max-w-2xl leading-relaxed">
@@ -47,7 +47,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
               <div className="mt-3 flex flex-wrap items-center gap-3 font-mono text-[11px] text-text-muted">
                 <span className="text-electric-lime">● CGPA: 8.15</span>
                 <span>● Rac-a-thon Special Mention</span>
-                <span>● Rotaract Event Chair</span>
+                <span>● Full-Stack & ML Focus</span>
               </div>
             </div>
 
@@ -73,19 +73,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
                 onClick={onExploreClick}
                 className="px-4 py-3.5 rounded-xl font-mono text-xs text-text-muted hover:text-white transition-colors"
               >
-                Explore The Four Interests ↓
+                Explore Technical Domains ↓
               </button>
             </div>
           </div>
 
           {/* Right Column: Visual Motif & Audio Atmosphere */}
           <div className="lg:col-span-5 space-y-6">
-            {/* Visual Motif Box */}
             <div className="relative rounded-3xl bg-graphite/80 backdrop-blur-md border border-white/10 p-6 shadow-2xl overflow-hidden group">
               <div className="flex items-center justify-between mb-4">
                 <span className="font-mono text-[10px] text-text-muted uppercase tracking-widest flex items-center gap-1.5">
                   <Compass className="w-3.5 h-3.5 text-electric-lime" />
-                  FOUR INTERESTS NEXUS
+                  TECHNICAL ARCHITECTURE NEXUS
                 </span>
                 <span className="font-mono text-[10px] text-electric-lime">
                   SHIV RAKSHANA R
@@ -103,50 +102,50 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onExploreClick }) => {
                   <span className="font-mono text-[8px] text-text-muted">CIT</span>
                 </div>
 
-                {/* 1. Books / Read */}
+                {/* 1. Software Engineering */}
                 <a
-                  href="#world-read"
+                  href="#domain-swe"
                   className="absolute top-4 left-6 p-2 rounded-xl bg-graphite border border-ice-blue/40 text-ice-blue shadow-sm hover:scale-105 transition-transform flex items-center gap-1.5"
                 >
-                  <BookOpen className="w-3.5 h-3.5" />
-                  <span className="font-mono text-[10px]">READ</span>
+                  <Code className="w-3.5 h-3.5" />
+                  <span className="font-mono text-[10px]">DEV</span>
                 </a>
 
-                {/* 2. Cooking / Create */}
+                {/* 2. Systems Analysis */}
                 <a
-                  href="#world-create"
+                  href="#domain-systems"
                   className="absolute top-4 right-6 p-2 rounded-xl bg-graphite border border-accent-amber/40 text-accent-amber shadow-sm hover:scale-105 transition-transform flex items-center gap-1.5"
                 >
-                  <Utensils className="w-3.5 h-3.5" />
-                  <span className="font-mono text-[10px]">CREATE</span>
+                  <Cpu className="w-3.5 h-3.5" />
+                  <span className="font-mono text-[10px]">ARCH</span>
                 </a>
 
-                {/* 3. Music / Listen */}
+                {/* 3. AI & ML */}
                 <a
-                  href="#world-listen"
+                  href="#domain-aiml"
                   className="absolute bottom-4 left-6 p-2 rounded-xl bg-graphite border border-accent-teal/40 text-accent-teal shadow-sm hover:scale-105 transition-transform flex items-center gap-1.5"
                 >
-                  <Headphones className="w-3.5 h-3.5" />
-                  <span className="font-mono text-[10px]">LISTEN</span>
+                  <Server className="w-3.5 h-3.5" />
+                  <span className="font-mono text-[10px]">AI/ML</span>
                 </a>
 
-                {/* 4. Tech / Build */}
+                {/* 4. Full-Stack & Systems */}
                 <a
-                  href="#world-build"
+                  href="#domain-fullstack"
                   className="absolute bottom-4 right-6 p-2 rounded-xl bg-graphite border border-electric-lime/40 text-electric-lime shadow-sm hover:scale-105 transition-transform flex items-center gap-1.5"
                 >
-                  <Terminal className="w-3.5 h-3.5" />
-                  <span className="font-mono text-[10px]">BUILD</span>
+                  <Database className="w-3.5 h-3.5" />
+                  <span className="font-mono text-[10px]">SYS</span>
                 </a>
               </div>
 
               <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs font-mono text-text-muted">
-                <span>Four Areas of Interest</span>
+                <span>Four Technical Domains</span>
                 <span className="text-text-soft font-medium">Software Systems Undergraduate</span>
               </div>
             </div>
 
-            {/* Audio Atmosphere component with zero autoplay */}
+            {/* Web Audio Telemetry Module */}
             <AudioAtmosphere />
           </div>
         </div>

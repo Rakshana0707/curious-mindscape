@@ -15,7 +15,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuditModal }) => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
 
-      const sections = ['hero', 'worlds', 'projects', 'case-study', 'about', 'experience', 'contact'];
+      const sections = ['hero', 'domains', 'projects', 'case-study', 'about', 'experience', 'contact'];
       const scrollPosition = window.scrollY + 200;
 
       for (const section of sections) {
@@ -37,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuditModal }) => {
 
   const navLinks = [
     { label: 'Overview', href: '#hero', id: 'hero' },
-    { label: 'Four Interests', href: '#worlds', id: 'worlds' },
+    { label: 'Technical Domains', href: '#domains', id: 'domains' },
     { label: 'Projects', href: '#projects', id: 'projects' },
     { label: 'Spotlight', href: '#case-study', id: 'case-study' },
     { label: 'About', href: '#about', id: 'about' },
@@ -98,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuditModal }) => {
             title="Inspect unified content inventory extracted from the 2 provided PDFs"
           >
             <FileCheck className="w-3.5 h-3.5 text-ice-blue" />
-            <span>PDF Data Audit</span>
+            <span>Resume Audit</span>
           </button>
 
           <a
@@ -157,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenAuditModal }) => {
                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-xs font-mono text-ice-blue bg-graphite border border-ice-blue/30"
               >
                 <FileCheck className="w-4 h-4" />
-                <span>PDF Content Inventory (Audit Log)</span>
+                <span>Resume Data Audit</span>
               </button>
               <a
                 href="#contact"

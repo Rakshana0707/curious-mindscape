@@ -1,23 +1,23 @@
 import React from 'react';
-import { BookOpen, Utensils, Headphones, Terminal } from 'lucide-react';
-import { InterestWorld } from '../data/portfolioData';
+import { Code, Cpu, Server, Database } from 'lucide-react';
+import { TechnicalDomain } from '../data/portfolioData';
 
 interface WorldCardProps {
-  world: InterestWorld;
+  world: TechnicalDomain;
 }
 
 export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
   const getIcon = (id: string) => {
     switch (id) {
-      case 'read':
-        return BookOpen;
-      case 'create':
-        return Utensils;
-      case 'listen':
-        return Headphones;
-      case 'build':
+      case 'swe':
+        return Code;
+      case 'systems':
+        return Cpu;
+      case 'aiml':
+        return Server;
+      case 'fullstack':
       default:
-        return Terminal;
+        return Database;
     }
   };
 
@@ -25,11 +25,11 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
 
   return (
     <article
-      id={`world-${world.id}`}
+      id={`domain-${world.id}`}
       className="relative rounded-2xl bg-graphite/70 backdrop-blur-md border border-white/10 p-6 flex flex-col justify-between group hover:border-white/20 transition-all duration-300 shadow-card"
     >
       <div>
-        {/* Top bar with Track pill */}
+        {/* Top bar with Domain Code */}
         <div className="flex items-center justify-between gap-3 mb-4">
           <span
             className="px-2.5 py-0.5 rounded-full font-mono text-[10px] uppercase font-bold tracking-wider"
@@ -39,7 +39,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({ world }) => {
               border: `1px solid ${world.accentColor}40`,
             }}
           >
-            {world.track}
+            {world.code}
           </span>
 
           <div

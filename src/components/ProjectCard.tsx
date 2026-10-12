@@ -1,6 +1,7 @@
 import React from 'react';
-import { ChevronRight, FileText } from 'lucide-react';
+import { ChevronRight, ExternalLink, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Project } from '../data/portfolioData';
+import { GitHubIcon } from './BrandIcons';
 
 interface ProjectCardProps {
   project: Project;
@@ -58,14 +59,38 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpenDetails
           {project.title}
         </h3>
 
-        {/* Short, factual description */}
+        {/* Short, factual summary */}
         <p className="font-inter text-sm text-text-muted mt-2 leading-relaxed">
           {project.description}
         </p>
 
-        {/* Resume bullet highlight */}
+        {/* Problem & Solution Breakdown */}
+        <div className="mt-4 space-y-2.5">
+          <div className="p-3 rounded-xl bg-obsidian/60 border border-white/5">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-accent-amber font-semibold block mb-1">
+              Problem Addressed
+            </span>
+            <p className="font-inter text-xs text-text-muted leading-relaxed">
+              {project.problem}
+            </p>
+          </div>
+
+          <div className="p-3 rounded-xl bg-obsidian/60 border border-white/5">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-electric-lime font-semibold block mb-1">
+              Solution Implemented
+            </span>
+            <p className="font-inter text-xs text-text-muted leading-relaxed">
+              {project.solution}
+            </p>
+          </div>
+        </div>
+
+        {/* Resume bullet points */}
         <div className="mt-4 pt-3 border-t border-white/5">
-          <ul className="space-y-2">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted font-semibold block mb-2">
+            Key Implementations
+          </span>
+          <ul className="space-y-1.5">
             {project.bullets.map((bullet, idx) => (
               <li key={idx} className="text-xs font-inter text-text-muted flex items-start gap-2 leading-relaxed">
                 <span className="w-1.5 h-1.5 rounded-full bg-electric-lime mt-1.5 shrink-0" />
@@ -76,7 +101,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpenDetails
         </div>
       </div>
 
-      {/* Tech Stack & Details button */}
+      {/* Tech Stack & Action Links */}
       <div className="mt-6 pt-4 border-t border-white/5">
         <div className="flex flex-wrap gap-1.5 mb-4">
           {project.technologies.map((tech, i) => (
@@ -89,16 +114,29 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpenDetails
           ))}
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[11px] text-text-muted">
-            {project.status || 'Academic Project'}
-          </span>
+        <div className="flex items-center justify-between gap-2">
+          {project.githubUrl ? (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-mono text-text-muted hover:text-white transition-colors"
+              title="View on GitHub"
+            >
+              <GitHubIcon className="w-3.5 h-3.5" />
+              <span>GitHub</span>
+            </a>
+          ) : (
+            <span className="font-mono text-[11px] text-text-muted">
+              {project.status || 'Academic Project'}
+            </span>
+          )}
 
           <button
             onClick={() => onOpenDetails(project)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium text-electric-lime bg-electric-lime/10 hover:bg-electric-lime/20 border border-electric-lime/30 transition-colors"
           >
-            <span>View Details</span>
+            <span>Technical Details</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
