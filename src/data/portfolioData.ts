@@ -55,7 +55,7 @@ export const portfolioData = {
     email: "sivrakshanaravikumar@gmail.com",
     location: "Coimbatore, Tamil Nadu, India",
     linkedin: "https://www.linkedin.com/in/shiv-rakshana-ravikumar",
-    github: "https://github.com/ShivRakshana",
+    github: "https://github.com/Rakshana0707",
   },
 
   education: [
