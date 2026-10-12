@@ -10,39 +10,64 @@ import { ProjectDetailModal } from './components/book/ProjectDetailModal';
 import { bookAudio } from './utils/audioUtils';
 
 export function App() {
-  // Current position:
-  // 0 = Front Hardcover
+  // Navigation State:
+  // 0 = Closed Front Hardcover
   // 1..9 = Interior Two-Page Spreads (Pages 1 to 18)
-  // 10 = Back Hardcover Jacket
+  // 10 = Closed Back Hardcover Jacket
   const [currentSpread, setCurrentSpread] = useState<number>(0);
+  const [turnDirection, setTurnDirection] = useState<'forward' | 'backward' | null>(null);
 
-  // Modals & view options
+  // Modals & view preferences
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isTocOpen, setIsTocOpen] = useState<boolean>(false);
   const [isPdfAuditOpen, setIsPdfAuditOpen] = useState<boolean>(false);
   const [isSinglePageMode, setIsSinglePageMode] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(bookAudio.getMuted());
 
-  const totalSpreads = 9;
+  const totalInteriorSpreads = 9;
 
-  // Sound & spread navigation handler
-  const handleNavigateSpread = useCallback((newSpread: number) => {
-    if (newSpread >= 0 && newSpread <= totalSpreads + 1) {
+  // Single consistent spread navigation handler
+  const handleNavigateSpread = useCallback((newSpread: number, direction?: 'forward' | 'backward') => {
+    if (newSpread >= 0 && newSpread <= totalInteriorSpreads + 1) {
+      const computedDir = direction || (newSpread > currentSpread ? 'forward' : 'backward');
+      setTurnDirection(computedDir);
       bookAudio.playPageTurn();
       setCurrentSpread(newSpread);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [totalSpreads]);
 
+      // Clear turning animation after realistic flip duration
+      setTimeout(() => {
+        setTurnDirection(null);
+      }, 450);
+    }
+  }, [currentSpread, totalInteriorSpreads]);
+
+  // Turn Next (forward)
   const handleTurnNext = useCallback(() => {
-    if (currentSpread < totalSpreads + 1) {
-      handleNavigateSpread(currentSpread + 1);
+    if (currentSpread < totalInteriorSpreads + 1) {
+      handleNavigateSpread(currentSpread + 1, 'forward');
     }
-  }, [currentSpread, totalSpreads, handleNavigateSpread]);
+  }, [currentSpread, totalInteriorSpreads, handleNavigateSpread]);
 
+  // Turn Prev (backward)
   const handleTurnPrev = useCallback(() => {
     if (currentSpread > 0) {
-      handleNavigateSpread(currentSpread - 1);
+      handleNavigateSpread(currentSpread - 1, 'backward');
+    }
+  }, [currentSpread, handleNavigateSpread]);
+
+  // Position-based page clicks for book interior (capped at interior boundaries):
+  // Left half click -> turn forward (capped at spread 9)
+  const handlePageClickForward = useCallback(() => {
+    if (currentSpread < totalInteriorSpreads) {
+      handleNavigateSpread(currentSpread + 1, 'forward');
+    }
+  }, [currentSpread, totalInteriorSpreads, handleNavigateSpread]);
+
+  // Right half click -> turn backward (capped at spread 1)
+  const handlePageClickBackward = useCallback(() => {
+    if (currentSpread > 1) {
+      handleNavigateSpread(currentSpread - 1, 'backward');
     }
   }, [currentSpread, handleNavigateSpread]);
 
@@ -54,7 +79,7 @@ export function App() {
   // Keyboard navigation listener (Left, Right, Escape, Home, End)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept typing in inputs or textareas
+      // Do not intercept typing in inputs or textareas
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
         return;
       }
@@ -69,19 +94,19 @@ export function App() {
         if (selectedProject) setSelectedProject(null);
         else if (isTocOpen) setIsTocOpen(false);
         else if (isPdfAuditOpen) setIsPdfAuditOpen(false);
-        else handleNavigateSpread(0);
+        else handleNavigateSpread(0, 'backward');
       } else if (e.key === 'Home') {
         e.preventDefault();
-        handleNavigateSpread(0);
+        handleNavigateSpread(0, 'backward');
       } else if (e.key === 'End') {
         e.preventDefault();
-        handleNavigateSpread(totalSpreads + 1);
+        handleNavigateSpread(totalInteriorSpreads + 1, 'forward');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleTurnNext, handleTurnPrev, handleNavigateSpread, selectedProject, isTocOpen, isPdfAuditOpen, totalSpreads]);
+  }, [handleTurnNext, handleTurnPrev, handleNavigateSpread, selectedProject, isTocOpen, isPdfAuditOpen, totalInteriorSpreads]);
 
   return (
     <div className="min-h-screen book-desk-atmosphere text-stone-100 flex flex-col justify-between selection:bg-amber-400 selection:text-stone-950 font-inter antialiased">
@@ -92,19 +117,23 @@ export function App() {
       {/* Main Book Stage */}
       <main className="flex-grow flex items-center justify-center pt-16 sm:pt-20 pb-20 px-2 sm:px-4">
         {currentSpread === 0 ? (
-          /* Front Hardcover */
-          <BookCover
-            onOpenBook={() => handleNavigateSpread(1)}
-            onOpenTableOfContents={() => setIsTocOpen(true)}
-            onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
-          />
-        ) : currentSpread === totalSpreads + 1 ? (
-          /* Back Hardcover Jacket */
-          <BookBackCover
-            onReopenBook={() => handleNavigateSpread(1)}
-            onReturnToCover={() => handleNavigateSpread(0)}
-            onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
-          />
+          /* Closed Front Hardcover */
+          <div className="cover-transition w-full flex justify-center">
+            <BookCover
+              onOpenBook={() => handleNavigateSpread(1, 'forward')}
+              onOpenTableOfContents={() => setIsTocOpen(true)}
+              onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
+            />
+          </div>
+        ) : currentSpread === totalInteriorSpreads + 1 ? (
+          /* Closed Back Hardcover Jacket */
+          <div className="cover-transition w-full flex justify-center">
+            <BookBackCover
+              onReopenBook={() => handleNavigateSpread(1, 'forward')}
+              onReturnToCover={() => handleNavigateSpread(0, 'backward')}
+              onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
+            />
+          </div>
         ) : (
           /* Interior Two-Page Spread (Spreads 1 to 9) */
           <BookSpread
@@ -112,17 +141,18 @@ export function App() {
             onOpenProjectModal={(project) => setSelectedProject(project)}
             onSelectChapter={(spreadIdx) => handleNavigateSpread(spreadIdx)}
             onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
-            onTurnPagePrev={handleTurnPrev}
-            onTurnPageNext={handleTurnNext}
+            onTurnPageForward={handlePageClickForward}
+            onTurnPageBackward={handlePageClickBackward}
             isSinglePageMode={isSinglePageMode}
+            turnDirection={turnDirection}
           />
         )}
       </main>
 
-      {/* Floating Book Navigation Console & Silk Bookmarks */}
+      {/* Persistent Navigation Toolbar & Floating Console */}
       <BookNavigation
         currentSpread={currentSpread}
-        totalSpreads={totalSpreads}
+        totalSpreads={totalInteriorSpreads}
         onNavigateSpread={handleNavigateSpread}
         onOpenTableOfContents={() => setIsTocOpen(true)}
         onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
@@ -136,7 +166,7 @@ export function App() {
       <TableOfContentsModal
         isOpen={isTocOpen}
         onClose={() => setIsTocOpen(false)}
-        onSelectChapter={handleNavigateSpread}
+        onSelectChapter={(spreadIdx) => handleNavigateSpread(spreadIdx)}
         currentSpread={currentSpread}
       />
 

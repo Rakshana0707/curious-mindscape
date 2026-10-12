@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { portfolioData, Project, CaseStudy } from '../../data/portfolioData';
 import { ContactBookForm } from './ContactBookForm';
 import { 
   Award, 
-  Cpu, 
   ExternalLink, 
   Mail, 
   Phone, 
@@ -12,10 +11,7 @@ import {
   Sparkles,
   MapPin,
   CheckCircle2,
-  FileText,
   Lightbulb,
-  AlertTriangle,
-  ArrowRight
 } from 'lucide-react';
 import { GitHubIcon, LinkedInIcon } from '../BrandIcons';
 
@@ -24,9 +20,10 @@ interface BookSpreadProps {
   onOpenProjectModal: (project: Project) => void;
   onSelectChapter: (spreadIndex: number) => void;
   onOpenPdfAudit: () => void;
-  onTurnPagePrev: () => void;
-  onTurnPageNext: () => void;
+  onTurnPageForward: () => void;
+  onTurnPageBackward: () => void;
   isSinglePageMode: boolean;
+  turnDirection?: 'forward' | 'backward' | null;
 }
 
 export const BookSpread: React.FC<BookSpreadProps> = ({
@@ -34,15 +31,84 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   onOpenProjectModal,
   onSelectChapter,
   onOpenPdfAudit,
-  onTurnPagePrev,
-  onTurnPageNext,
+  onTurnPageForward,
+  onTurnPageBackward,
   isSinglePageMode,
+  turnDirection,
 }) => {
   const leftPageNum = spreadIndex * 2 - 1;
   const rightPageNum = spreadIndex * 2;
+  const totalInteriorSpreads = 9;
 
   // Chapter metadata
   const chapter = portfolioData.chapters.find(c => c.spreadIndex === spreadIndex) || portfolioData.chapters[0];
+
+  // Touch swipe tracking refs
+  const touchStartRef = useRef<{ x: number; y: number; isInteractive: boolean }>({ x: 0, y: 0, isInteractive: false });
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const target = e.target as HTMLElement;
+    const isInteractive = Boolean(target.closest('button, a, input, textarea, select, [role="button"], label, .interactive-element'));
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
+      isInteractive,
+    };
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartRef.current.isInteractive) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartRef.current.x;
+    const deltaY = e.changedTouches[0].clientY - touchStartRef.current.y;
+
+    // Check if horizontal swipe is dominant and exceeds threshold
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0 && spreadIndex < totalInteriorSpreads) {
+        // Swipe left -> turn forward
+        onTurnPageForward();
+      } else if (deltaX > 0 && spreadIndex > 1) {
+        // Swipe right -> turn backward
+        onTurnPageBackward();
+      }
+    }
+  };
+
+  // Position-based Click Handlers:
+  // Left half click -> Turn FORWARD
+  const handleLeftPageClick = (e: React.MouseEvent) => {
+    // 1. If text is selected, do not trigger page flip
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim().length > 0) return;
+
+    // 2. If click was inside an interactive control, do not turn
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, textarea, select, [role="button"], label, .interactive-element')) {
+      return;
+    }
+
+    // 3. Prevent moving beyond last interior spread
+    if (spreadIndex < totalInteriorSpreads) {
+      onTurnPageForward();
+    }
+  };
+
+  // Right half click -> Turn BACKWARD
+  const handleRightPageClick = (e: React.MouseEvent) => {
+    // 1. If text is selected, do not trigger page flip
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim().length > 0) return;
+
+    // 2. If click was inside an interactive control, do not turn
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, textarea, select, [role="button"], label, .interactive-element')) {
+      return;
+    }
+
+    // 3. Prevent moving beyond first interior spread
+    if (spreadIndex > 1) {
+      onTurnPageBackward();
+    }
+  };
 
   // Helper for rendering project cards inside project chapters
   const renderProjectPage = (project: Project) => (
@@ -128,7 +194,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
         </span>
         <button
           onClick={() => onOpenProjectModal(project)}
-          className="font-cinzel text-xs font-semibold text-amber-900 hover:text-amber-950 flex items-center gap-1 cursor-pointer"
+          className="font-cinzel text-xs font-semibold text-amber-900 hover:text-amber-950 flex items-center gap-1 cursor-pointer interactive-element"
         >
           <span>Deep-Dive Specs</span>
           <ChevronRight className="w-3.5 h-3.5" />
@@ -239,17 +305,39 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   );
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-2 sm:p-6 lg:p-8 flex items-center justify-center">
+    <div 
+      className="w-full max-w-6xl mx-auto p-2 sm:p-6 lg:p-8 flex items-center justify-center select-text"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Book Spread Outer Container with 3D Depth & Page Stack */}
-      <div className="relative w-full bg-book-paper text-book-ink rounded-lg shadow-2xl border-t border-b border-amber-950/20 book-shadow-cast flex flex-col md:flex-row overflow-hidden min-h-[740px] lg:min-h-[800px]">
+      <div className={`relative w-full bg-book-paper text-book-ink rounded-lg shadow-2xl border-t border-b border-amber-950/20 book-shadow-cast flex flex-col md:flex-row overflow-hidden min-h-[740px] lg:min-h-[800px] transition-all duration-300 ${
+        turnDirection === 'forward' ? 'page-turn-anim-forward' : turnDirection === 'backward' ? 'page-turn-anim-backward' : ''
+      }`}>
         
         {/* =========================================================================
-            LEFT PAGE (VERSO)
+            LEFT PAGE (VERSO) — CLICK TO TURN FORWARD
             ========================================================================= */}
-        <div className={`relative flex-1 p-6 sm:p-8 lg:p-10 parchment-sheet edge-stack-left flex flex-col justify-between border-b md:border-b-0 md:border-r border-amber-900/15 ${isSinglePageMode ? 'hidden md:flex' : 'flex'}`}>
+        <div 
+          onClick={handleLeftPageClick}
+          className={`relative flex-1 p-6 sm:p-8 lg:p-10 parchment-sheet edge-stack-left flex flex-col justify-between border-b md:border-b-0 md:border-r border-amber-900/15 page-verso-interactive group/left cursor-pointer transition-colors ${
+            isSinglePageMode ? 'hidden md:flex' : 'flex'
+          }`}
+          title={spreadIndex < totalInteriorSpreads ? "Click left half to turn forward (Next page)" : "Final interior spread"}
+          aria-label="Click left half of the book to advance forward"
+        >
+          {/* Subtle Left Edge Glow Hover Cue */}
+          <div className="page-edge-glow-left" />
+
+          {/* Floating Edge Tooltip Indicator on Hover */}
+          {spreadIndex < totalInteriorSpreads && (
+            <div className="absolute left-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover/left:opacity-100 transition-all pointer-events-none bg-stone-950/90 text-amber-200 text-[10px] font-cinzel font-bold px-2 py-1 rounded shadow-lg border border-amber-500/40 flex items-center gap-1 z-30 select-none">
+              <span>Next page ➔</span>
+            </div>
+          )}
           
           {/* Inner Verso Shadow (Spine Crease) */}
-          <div className="absolute inset-y-0 right-0 w-16 page-verso-shadow hidden md:block" />
+          <div className="absolute inset-y-0 right-0 w-16 page-verso-shadow hidden md:block pointer-events-none" />
 
           {/* Left Page Running Header */}
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-amber-900/20 text-xs font-cinzel text-amber-900 tracking-[0.2em] uppercase select-none">
@@ -304,7 +392,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                       href={portfolioData.personal.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-950 hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-950 hover:underline interactive-element"
                     >
                       <GitHubIcon className="w-3.5 h-3.5" />
                       <span>github.com/Rakshana0707</span>
@@ -314,7 +402,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                       href={portfolioData.personal.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-950 hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-950 hover:underline interactive-element"
                     >
                       <LinkedInIcon className="w-3.5 h-3.5" />
                       <span>LinkedIn Profile</span>
@@ -340,8 +428,11 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                   {portfolioData.chapters.map(ch => (
                     <div
                       key={ch.id}
-                      onClick={() => onSelectChapter(ch.spreadIndex)}
-                      className="flex items-baseline justify-between group cursor-pointer text-xs p-1.5 rounded hover:bg-amber-100/50 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectChapter(ch.spreadIndex);
+                      }}
+                      className="flex items-baseline justify-between group cursor-pointer text-xs p-1.5 rounded hover:bg-amber-100/50 transition-colors interactive-element"
                     >
                       <div className="flex items-baseline gap-2">
                         <span className="font-cinzel font-bold text-amber-900 w-6">
@@ -360,7 +451,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                 </div>
 
                 <div className="mt-4 p-3 bg-amber-50/60 rounded border border-amber-900/10 text-xs font-garamond italic text-stone-700">
-                  Tip: Use the top <strong>CONTENTS</strong> button or arrow keys anytime to jump between chapters.
+                  Tip: Click the <strong>left half</strong> of the book to advance forward, or the <strong>right half</strong> to reverse backward.
                 </div>
               </div>
             )}
@@ -487,7 +578,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                     <div className="pt-2 space-y-2">
                       <a
                         href={`mailto:${portfolioData.personal.email}`}
-                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors interactive-element"
                       >
                         <Mail className="w-3.5 h-3.5 text-amber-800" />
                         <span>{portfolioData.personal.email}</span>
@@ -495,7 +586,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
 
                       <a
                         href={`tel:${portfolioData.personal.phone.replace(/\s+/g, '')}`}
-                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors interactive-element"
                       >
                         <Phone className="w-3.5 h-3.5 text-amber-800" />
                         <span>{portfolioData.personal.phone}</span>
@@ -505,7 +596,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                         href={portfolioData.personal.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors interactive-element"
                       >
                         <GitHubIcon className="w-3.5 h-3.5 text-amber-800" />
                         <span>github.com/Rakshana0707</span>
@@ -516,7 +607,7 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                         href={portfolioData.personal.linkedin}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors"
+                        className="flex items-center gap-2 text-stone-800 hover:text-amber-900 font-mono transition-colors interactive-element"
                       >
                         <LinkedInIcon className="w-3.5 h-3.5 text-amber-800" />
                         <span>linkedin.com/in/shiv-rakshana-ravikumar</span>
@@ -528,8 +619,11 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
 
                 {/* Audit trigger */}
                 <div 
-                  onClick={onOpenPdfAudit}
-                  className="p-3 bg-amber-50/80 rounded border border-amber-900/20 cursor-pointer hover:bg-amber-100/70 transition-colors flex items-center justify-between"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenPdfAudit();
+                  }}
+                  className="p-3 bg-amber-50/80 rounded border border-amber-900/20 cursor-pointer hover:bg-amber-100/70 transition-colors flex items-center justify-between interactive-element"
                 >
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-700" />
@@ -546,13 +640,17 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
 
           {/* Left Page Running Footer */}
           <div className="flex items-center justify-between pt-3 mt-4 border-t border-amber-900/15 text-xs font-mono text-stone-600 select-none">
-            <span 
-              onClick={onTurnPagePrev}
-              className="hover:text-amber-900 cursor-pointer flex items-center gap-1 font-cinzel text-[11px] font-semibold"
-            >
-              ◀ Turn Page
-            </span>
             <span className="font-bold">p. {leftPageNum}</span>
+            <span 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (spreadIndex < totalInteriorSpreads) onTurnPageForward();
+              }}
+              className="hover:text-amber-900 cursor-pointer flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element"
+              title="Turn forward to next spread"
+            >
+              Next Page ▶
+            </span>
           </div>
 
         </div>
@@ -561,18 +659,32 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
         {/* =========================================================================
             CENTER SPINE BINDING CREASE (DESKTOP)
             ========================================================================= */}
-        <div className="hidden md:flex w-6 bg-gradient-to-r from-stone-400/20 via-stone-800/20 to-stone-400/20 shadow-inner shrink-0 relative items-center justify-center">
+        <div className="hidden md:flex w-6 bg-gradient-to-r from-stone-400/20 via-stone-800/20 to-stone-400/20 shadow-inner shrink-0 relative items-center justify-center pointer-events-none">
           <div className="w-[1px] h-full bg-amber-900/20" />
         </div>
 
 
         {/* =========================================================================
-            RIGHT PAGE (RECTO)
+            RIGHT PAGE (RECTO) — CLICK TO TURN BACKWARD
             ========================================================================= */}
-        <div className="relative flex-1 p-6 sm:p-8 lg:p-10 parchment-sheet edge-stack-right flex flex-col justify-between">
-          
+        <div 
+          onClick={handleRightPageClick}
+          className="relative flex-1 p-6 sm:p-8 lg:p-10 parchment-sheet edge-stack-right flex flex-col justify-between page-recto-interactive group/right cursor-pointer transition-colors"
+          title={spreadIndex > 1 ? "Click right half to turn backward (Previous page)" : "First interior spread"}
+          aria-label="Click right half of the book to turn backward"
+        >
+          {/* Subtle Right Edge Glow Hover Cue */}
+          <div className="page-edge-glow-right" />
+
+          {/* Floating Edge Tooltip Indicator on Hover */}
+          {spreadIndex > 1 && (
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover/right:opacity-100 transition-all pointer-events-none bg-stone-950/90 text-amber-200 text-[10px] font-cinzel font-bold px-2 py-1 rounded shadow-lg border border-amber-500/40 flex items-center gap-1 z-30 select-none">
+              <span>⬅ Previous page</span>
+            </div>
+          )}
+
           {/* Inner Recto Shadow (Spine Crease) */}
-          <div className="absolute inset-y-0 left-0 w-16 page-recto-shadow hidden md:block" />
+          <div className="absolute inset-y-0 left-0 w-16 page-recto-shadow hidden md:block pointer-events-none" />
 
           {/* Right Page Running Header */}
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-amber-900/20 text-xs font-cinzel text-amber-900 tracking-[0.2em] uppercase select-none">
@@ -817,20 +929,26 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
                     Direct Email Dispatch
                   </h3>
                 </div>
-                <ContactBookForm />
+                <div className="interactive-element">
+                  <ContactBookForm />
+                </div>
               </div>
             )}
           </div>
 
           {/* Right Page Running Footer */}
           <div className="flex items-center justify-between pt-3 mt-4 border-t border-amber-900/15 text-xs font-mono text-stone-600 select-none">
-            <span className="font-bold">p. {rightPageNum}</span>
             <span 
-              onClick={onTurnPageNext}
-              className="hover:text-amber-900 cursor-pointer flex items-center gap-1 font-cinzel text-[11px] font-semibold"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (spreadIndex > 1) onTurnPageBackward();
+              }}
+              className="hover:text-amber-900 cursor-pointer flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element"
+              title="Turn backward to previous spread"
             >
-              Turn Page ▶
+              ◀ Previous Page
             </span>
+            <span className="font-bold">p. {rightPageNum}</span>
           </div>
 
         </div>

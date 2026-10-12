@@ -7,18 +7,17 @@ import {
   Volume2, 
   VolumeX, 
   BookOpen, 
-  ListOrdered, 
   ShieldCheck, 
   Columns, 
   Square,
   Home,
   Bookmark,
-  Sparkles,
-  RotateCcw
+  RotateCcw,
+  BookMarked
 } from 'lucide-react';
 
 interface BookNavigationProps {
-  currentSpread: number; // 0 = Cover, 1..9 = Spreads 1-9, 10 = Back Cover
+  currentSpread: number; // 0 = Cover, 1..9 = Interior Spreads 1-9, 10 = Back Cover
   totalSpreads: number;
   onNavigateSpread: (index: number) => void;
   onOpenTableOfContents: () => void;
@@ -43,14 +42,25 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
   const isCover = currentSpread === 0;
   const isBack = currentSpread === totalSpreads + 1;
 
-  const handlePrev = () => {
+  // Navigation handlers
+  const handleGoFrontCover = () => {
+    bookAudio.playPageTurn();
+    onNavigateSpread(0);
+  };
+
+  const handleGoBackCover = () => {
+    bookAudio.playPageTurn();
+    onNavigateSpread(totalSpreads + 1);
+  };
+
+  const handlePrevPage = () => {
     if (currentSpread > 0) {
       bookAudio.playPageTurn();
       onNavigateSpread(currentSpread - 1);
     }
   };
 
-  const handleNext = () => {
+  const handleNextPage = () => {
     if (currentSpread < totalSpreads + 1) {
       bookAudio.playPageTurn();
       onNavigateSpread(currentSpread + 1);
@@ -60,18 +70,19 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
   return (
     <>
       {/* =========================================================================
-          PERSISTENT TOP RECRUITER NAVIGATION BAR
+          PERSISTENT TOP RECRUITER NAVIGATION BAR & BOOK TOOLBAR
           ========================================================================= */}
       <header 
-        aria-label="Book Header Navigation"
-        className="fixed top-0 left-0 right-0 z-40 bg-stone-950/90 backdrop-blur-md border-b border-amber-900/30 px-3 sm:px-6 py-2 flex items-center justify-between text-stone-200"
+        aria-label="Book Navigation Header"
+        className="fixed top-0 left-0 right-0 z-40 bg-stone-950/95 backdrop-blur-md border-b border-amber-900/35 px-3 sm:px-6 py-2 flex items-center justify-between text-stone-200 shadow-md"
       >
-        {/* Left: Book Branding */}
+        {/* Left: Book Title & Monogram */}
         <div className="flex items-center gap-2.5">
           <button
-            onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(0); }}
+            onClick={handleGoFrontCover}
             className="flex items-center gap-2 text-left group cursor-pointer"
-            title="Return to Front Hardcover"
+            title="Return to Front Cover"
+            aria-label="Return to Front Cover"
           >
             <div className="w-7 h-7 rounded border border-amber-400/40 bg-amber-950/40 flex items-center justify-center text-[10px] font-cinzel font-bold text-amber-200 group-hover:border-amber-400 transition-colors">
               SRR
@@ -87,87 +98,84 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
           </button>
         </div>
 
-        {/* Center: Recruiter Quick Jump Pathway */}
-        <div className="flex items-center gap-1 sm:gap-2">
-          {/* Prominent Contents Control */}
+        {/* Center: Core Persistent Controls Suite (Front Cover, Contents, Prev, Next, Back Cover) */}
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          {/* 1. Front Cover Button */}
           <button
-            onClick={onOpenTableOfContents}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 hover:border-amber-400 text-amber-200 hover:text-amber-100 font-cinzel text-xs font-bold tracking-wider shadow-sm transition-all cursor-pointer"
-            title="Open Table of Contents (Index)"
+            onClick={handleGoFrontCover}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-cinzel tracking-wider transition-all cursor-pointer ${
+              isCover
+                ? 'bg-amber-950/90 border-amber-400 text-amber-200 shadow-sm'
+                : 'bg-zinc-900/90 hover:bg-zinc-800 border-zinc-700/60 text-stone-300 hover:text-amber-200'
+            }`}
+            title="Return directly to Front Cover"
+            aria-label="Front Cover"
           >
-            <Bookmark className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30" />
-            <span>CONTENTS</span>
+            <Home className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden md:inline font-semibold">Front Cover</span>
+            <span className="md:hidden font-semibold">Cover</span>
           </button>
 
-          {/* Unobtrusive Return to Synopsis */}
-          {!isCover && currentSpread !== 1 && (
-            <button
-              onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(1); }}
-              className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded bg-zinc-900/80 hover:bg-zinc-800 text-stone-300 hover:text-amber-200 text-xs font-cinzel tracking-wide transition-colors cursor-pointer"
-              title="Return to Synopsis (p. 2)"
-            >
-              <RotateCcw className="w-3 h-3 text-amber-400" />
-              <span>Synopsis</span>
-            </button>
-          )}
+          {/* 2. Contents Button */}
+          <button
+            onClick={onOpenTableOfContents}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-950/80 hover:bg-amber-900 border border-amber-500/50 hover:border-amber-400 text-amber-200 hover:text-amber-100 font-cinzel text-xs font-bold tracking-wider shadow-sm transition-all cursor-pointer"
+            title="Open Table of Contents (Index)"
+            aria-label="Table of Contents"
+          >
+            <Bookmark className="w-3.5 h-3.5 text-amber-400 fill-amber-400/30" />
+            <span>Contents</span>
+          </button>
 
-          {/* Quick Direct Destinations */}
-          <div className="hidden md:flex items-center gap-1">
-            <button
-              onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(2); }}
-              className={`px-2 py-1 rounded text-xs font-cinzel transition-colors cursor-pointer ${
-                currentSpread === 2 ? 'text-amber-300 font-bold bg-amber-950/40' : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              Skills
-            </button>
+          {/* 3. Previous Page Button */}
+          <button
+            onClick={handlePrevPage}
+            disabled={isCover}
+            className="flex items-center gap-0.5 px-2 py-1.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none border border-zinc-700/60 text-stone-300 hover:text-amber-200 font-cinzel text-xs transition-colors cursor-pointer"
+            title="Turn backward one page / spread"
+            aria-label="Previous Page"
+          >
+            <ChevronLeft className="w-3.5 h-3.5 text-amber-300" />
+            <span className="hidden lg:inline">Prev</span>
+          </button>
 
-            <button
-              onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(3); }}
-              className={`px-2 py-1 rounded text-xs font-cinzel transition-colors cursor-pointer ${
-                [3, 4, 5, 6].includes(currentSpread) ? 'text-amber-300 font-bold bg-amber-950/40' : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              Projects
-            </button>
+          {/* 4. Next Page Button */}
+          <button
+            onClick={handleNextPage}
+            disabled={isBack}
+            className="flex items-center gap-0.5 px-2 py-1.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none border border-zinc-700/60 text-stone-300 hover:text-amber-200 font-cinzel text-xs transition-colors cursor-pointer"
+            title="Turn forward one page / spread"
+            aria-label="Next Page"
+          >
+            <span className="hidden lg:inline">Next</span>
+            <ChevronRight className="w-3.5 h-3.5 text-amber-300" />
+          </button>
 
-            <button
-              onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(7); }}
-              className={`px-2 py-1 rounded text-xs font-cinzel transition-colors cursor-pointer ${
-                currentSpread === 7 ? 'text-amber-300 font-bold bg-amber-950/40' : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              Case Studies
-            </button>
-
-            <button
-              onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(8); }}
-              className={`px-2 py-1 rounded text-xs font-cinzel transition-colors cursor-pointer ${
-                currentSpread === 8 ? 'text-amber-300 font-bold bg-amber-950/40' : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              Experience
-            </button>
-
-            <button
-              onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(9); }}
-              className={`px-2 py-1 rounded text-xs font-cinzel transition-colors cursor-pointer ${
-                currentSpread === 9 ? 'text-amber-300 font-bold bg-amber-950/40' : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              Contact
-            </button>
-          </div>
+          {/* 5. Back Cover Button */}
+          <button
+            onClick={handleGoBackCover}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-cinzel tracking-wider transition-all cursor-pointer ${
+              isBack
+                ? 'bg-amber-950/90 border-amber-400 text-amber-200 shadow-sm'
+                : 'bg-zinc-900/90 hover:bg-zinc-800 border-zinc-700/60 text-stone-300 hover:text-amber-200'
+            }`}
+            title="Navigate directly to Back Cover"
+            aria-label="Back Cover"
+          >
+            <BookMarked className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden md:inline font-semibold">Back Cover</span>
+            <span className="md:hidden font-semibold">Back</span>
+          </button>
         </div>
 
-        {/* Right: Audio Sound & Audit */}
+        {/* Right: Audio Sound, View Mode & Audit Trigger */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Sound Toggle */}
+          {/* Sound Mute/Unmute */}
           <button
             onClick={onToggleMute}
-            className="p-1.5 rounded hover:bg-zinc-800 text-stone-400 hover:text-amber-300 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-stone-400 hover:text-amber-300 transition-colors cursor-pointer"
             title={isMuted ? 'Turn Page Flip Sound ON' : 'Mute Sound'}
-            aria-label="Toggle Page Turning Sound"
+            aria-label="Toggle Page Sound"
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-stone-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
           </button>
@@ -175,9 +183,9 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
           {/* Spread / Single-Page Mode Toggle */}
           <button
             onClick={onToggleSinglePageMode}
-            className="hidden md:flex p-1.5 rounded hover:bg-zinc-800 text-stone-400 hover:text-amber-300 transition-colors cursor-pointer"
+            className="hidden md:flex p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-stone-400 hover:text-amber-300 transition-colors cursor-pointer"
             title={isSinglePageMode ? 'Switch to Two-Page Spread' : 'Switch to Single-Page Focus'}
-            aria-label="Toggle Page Spread View"
+            aria-label="Toggle View Mode"
           >
             {isSinglePageMode ? <Columns className="w-4 h-4 text-stone-300" /> : <Square className="w-4 h-4 text-stone-300" />}
           </button>
@@ -185,8 +193,9 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
           {/* Audit Verification Trigger */}
           <button
             onClick={onOpenPdfAudit}
-            className="flex items-center gap-1 px-2 py-1 rounded text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/40 text-stone-300 hover:text-emerald-300 transition-colors cursor-pointer"
-            title="Inspect 100% Resume Audit against PDF 1 & PDF 2"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-mono bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-emerald-500/40 text-stone-300 hover:text-emerald-300 transition-colors cursor-pointer"
+            title="Verify against Source PDFs"
+            aria-label="Audit Resume PDFs"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span className="hidden sm:inline text-[11px]">Audit</span>
@@ -195,47 +204,48 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
       </header>
 
       {/* =========================================================================
-          FLOATING BOTTOM CONSOLE
+          PERSISTENT FLOATING BOTTOM TOOLBAR
           ========================================================================= */}
       <nav 
-        aria-label="Book Page Navigation"
-        className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-auto sm:left-1/2 sm:-translate-x-1/2 z-40 flex items-center justify-between sm:justify-center gap-2 sm:gap-3 px-3 py-2 bg-stone-950/95 backdrop-blur-md border border-amber-500/25 rounded-xl shadow-2xl text-stone-200"
+        aria-label="Persistent Book Toolbar"
+        className="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-auto sm:left-1/2 sm:-translate-x-1/2 z-40 flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2.5 px-3 py-2 bg-stone-950/95 backdrop-blur-md border border-amber-500/30 rounded-xl shadow-2xl text-stone-200"
       >
-        {/* Cover Action */}
+        {/* Front Cover Button */}
         <button
-          onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(0); }}
-          className={`p-1.5 rounded transition-colors cursor-pointer ${
-            isCover ? 'bg-amber-950/80 text-amber-300' : 'hover:bg-zinc-800 text-stone-400 hover:text-stone-200'
+          onClick={handleGoFrontCover}
+          className={`flex items-center gap-1 px-2 py-1.5 rounded-lg transition-colors cursor-pointer ${
+            isCover ? 'bg-amber-950 text-amber-300 font-bold' : 'hover:bg-zinc-800 text-stone-400 hover:text-stone-200'
           }`}
-          title="Front Hardcover"
-          aria-label="Go to Cover"
+          title="Return to Front Cover"
+          aria-label="Go to Front Cover"
         >
           <Home className="w-4 h-4" />
+          <span className="text-[11px] font-cinzel hidden sm:inline">Cover</span>
         </button>
 
         <div className="h-4 w-[1px] bg-zinc-800" />
 
-        {/* Previous Page */}
+        {/* Previous Page Button */}
         <button
-          onClick={handlePrev}
+          onClick={handlePrevPage}
           disabled={isCover}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer text-xs font-cinzel text-amber-200"
-          title="Previous Page (Left Arrow)"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer text-xs font-cinzel text-amber-200"
+          title="Turn backward one page / spread"
           aria-label="Previous Page"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="hidden sm:inline">Prev</span>
         </button>
 
-        {/* Page & Spread Indicator */}
+        {/* Current State / Spread Indicator */}
         <div className="px-3 py-0.5 text-center min-w-[130px] sm:min-w-[170px] select-none">
           {isCover ? (
             <span className="text-xs font-cinzel font-bold text-amber-300 tracking-wider">
-              FRONT HARDCOVER
+              CLOSED FRONT COVER
             </span>
           ) : isBack ? (
             <span className="text-xs font-cinzel font-bold text-amber-300 tracking-wider">
-              BACK COVER JACKET
+              CLOSED BACK COVER
             </span>
           ) : (
             <div className="flex flex-col items-center">
@@ -249,12 +259,12 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
           )}
         </div>
 
-        {/* Next Page */}
+        {/* Next Page Button */}
         <button
-          onClick={handleNext}
+          onClick={handleNextPage}
           disabled={isBack}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer text-xs font-cinzel text-amber-200"
-          title="Next Page (Right Arrow)"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer text-xs font-cinzel text-amber-200"
+          title="Turn forward one page / spread"
           aria-label="Next Page"
         >
           <span className="hidden sm:inline">Next</span>
@@ -263,16 +273,30 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
 
         <div className="h-4 w-[1px] bg-zinc-800" />
 
-        {/* Back Jacket Action */}
+        {/* Contents Trigger */}
         <button
-          onClick={() => { bookAudio.playPageTurn(); onNavigateSpread(totalSpreads + 1); }}
-          className={`p-1.5 rounded transition-colors cursor-pointer ${
-            isBack ? 'bg-amber-950/80 text-amber-300' : 'hover:bg-zinc-800 text-stone-400 hover:text-stone-200'
+          onClick={onOpenTableOfContents}
+          className="flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-zinc-800 text-stone-300 hover:text-amber-200 transition-colors cursor-pointer"
+          title="Open Table of Contents"
+          aria-label="Open Table of Contents"
+        >
+          <Bookmark className="w-4 h-4 text-amber-400" />
+          <span className="text-[11px] font-cinzel hidden sm:inline">Index</span>
+        </button>
+
+        <div className="h-4 w-[1px] bg-zinc-800" />
+
+        {/* Back Cover Button */}
+        <button
+          onClick={handleGoBackCover}
+          className={`flex items-center gap-1 px-2 py-1.5 rounded-lg transition-colors cursor-pointer ${
+            isBack ? 'bg-amber-950 text-amber-300 font-bold' : 'hover:bg-zinc-800 text-stone-400 hover:text-stone-200'
           }`}
-          title="Back Cover Jacket"
+          title="Navigate directly to Back Cover"
           aria-label="Go to Back Cover"
         >
-          <BookOpen className="w-4 h-4" />
+          <BookMarked className="w-4 h-4" />
+          <span className="text-[11px] font-cinzel hidden sm:inline">Back</span>
         </button>
       </nav>
     </>
