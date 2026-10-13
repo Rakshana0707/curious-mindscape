@@ -123,10 +123,10 @@ export const portfolioData = {
 
   skills: {
     programmingLanguages: ["Java", "Python", "C++", "8086 Assembly"],
-    webDevelopment: ["HTML", "CSS", "JavaScript", "React.js", "TypeScript", "Tailwind CSS", "Node.js", "FastAPI", "Flask"],
+    webDevelopment: ["HTML", "CSS", "JavaScript", "React.js", "Tailwind CSS", "Node.js", "FastAPI", "Flask"],
     machineLearning: ["Scikit-learn", "Pandas", "NumPy", "Matplotlib", "EDA", "Data Visualization", "Random Forest", "Classification", "Regression"],
-    databases: ["Firebase", "MySQL", "SQLite", "Oracle (PL/SQL)"],
-    aiAndIntegration: ["Prompt Engineering", "Gemini API", "GPT-4o", "OpenRouter API", "Web Speech API", "Streamlit"],
+    databases: ["Firebase", "MySQL", "SQLite"],
+    aiAndIntegration: ["Gemini API", "GPT-4o", "OpenRouter API", "Web Speech API", "Streamlit"],
     areasOfInterest: [
       "Machine Learning",
       "Data Analytics & Predictive Analytics",
