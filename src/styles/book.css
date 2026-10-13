@@ -282,3 +282,129 @@
   }
 }
 
+/* =========================================================================
+   ST-PAGEFLIP / REACT-PAGEFLIP 3D PHYSICAL BOOK ENGINE ENHANCEMENTS
+   ========================================================================= */
+
+/* Ensure wrapper height is respected when StPageFlip sets padding-bottom */
+.sft__wrapper,
+.stf__wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stf__parent {
+  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.85));
+}
+
+.stf__block {
+  perspective: 2500px !important;
+}
+
+/* Individual physical sheet in the flipbook */
+.stf__item {
+  background-color: #FAF8F3;
+  box-shadow: inset 0 0 30px rgba(139, 110, 31, 0.06);
+  overflow: hidden;
+  backface-visibility: visible;
+}
+
+/* Spine shadow crease based on left (--left) vs right (--right) page orientation */
+.stf__item.--left {
+  border-right: 1px solid rgba(120, 85, 30, 0.22);
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.stf__item.--right {
+  border-left: 1px solid rgba(120, 85, 30, 0.22);
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* Outer hard book frame / leather binding trim around open spread */
+.book-open-binding-frame {
+  position: relative;
+  background: linear-gradient(135deg, #1a1612 0%, #0f0d0b 50%, #1a1612 100%);
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid rgba(212, 175, 55, 0.28);
+  box-shadow:
+    0 35px 70px -15px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    inset 0 0 18px rgba(0, 0, 0, 0.85);
+}
+
+/* Realistic Stacked Paper Edges on Left and Right of the Open Book */
+.book-open-binding-frame::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 4px;
+  width: 10px;
+  background: repeating-linear-gradient(
+    to right,
+    #E8E2D5 0px,
+    #E8E2D5 1px,
+    #CFC7B6 1px,
+    #CFC7B6 2px
+  );
+  border-radius: 3px 0 0 3px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.book-open-binding-frame::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  right: 4px;
+  width: 10px;
+  background: repeating-linear-gradient(
+    to left,
+    #E8E2D5 0px,
+    #E8E2D5 1px,
+    #CFC7B6 1px,
+    #CFC7B6 2px
+  );
+  border-radius: 0 3px 3px 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Center spine binding groove */
+.book-center-spine-overlay {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.08) 25%,
+    rgba(25, 18, 10, 0.32) 48%,
+    rgba(60, 42, 18, 0.45) 50%,
+    rgba(25, 18, 10, 0.32) 52%,
+    rgba(0, 0, 0, 0.08) 75%,
+    transparent 100%
+  );
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .page-turn-anim-forward,
+  .page-turn-anim-backward,
+  .cover-transition {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+

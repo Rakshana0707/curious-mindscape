@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { portfolioData, Project } from './data/portfolioData';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Project } from './data/portfolioData';
 import { BookCover } from './components/book/BookCover';
 import { BookBackCover } from './components/book/BookBackCover';
-import { BookSpread } from './components/book/BookSpread';
+import { BookSpread, BookSpreadHandle } from './components/book/BookSpread';
 import { BookNavigation } from './components/book/BookNavigation';
 import { TableOfContentsModal } from './components/book/TableOfContentsModal';
 import { PdfVerificationModal } from './components/book/PdfVerificationModal';
@@ -15,7 +15,7 @@ export function App() {
   // 1..9 = Interior Two-Page Spreads (Pages 1 to 18)
   // 10 = Closed Back Hardcover Jacket
   const [currentSpread, setCurrentSpread] = useState<number>(0);
-  const [turnDirection, setTurnDirection] = useState<'forward' | 'backward' | null>(null);
+  const bookSpreadRef = useRef<BookSpreadHandle | null>(null);
 
   // Modals & view preferences
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -27,47 +27,68 @@ export function App() {
   const totalInteriorSpreads = 9;
 
   // Single consistent spread navigation handler
-  const handleNavigateSpread = useCallback((newSpread: number, direction?: 'forward' | 'backward') => {
-    if (newSpread >= 0 && newSpread <= totalInteriorSpreads + 1) {
-      const computedDir = direction || (newSpread > currentSpread ? 'forward' : 'backward');
-      setTurnDirection(computedDir);
-      bookAudio.playPageTurn();
-      setCurrentSpread(newSpread);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleNavigateSpread = useCallback((newSpread: number) => {
+    if (newSpread < 0 || newSpread > totalInteriorSpreads + 1) return;
 
-      // Clear turning animation after realistic flip duration
-      setTimeout(() => {
-        setTurnDirection(null);
-      }, 450);
+    // If navigating between interior spreads while book is already open, trigger 3D physical page turn
+    if (
+      currentSpread >= 1 &&
+      currentSpread <= totalInteriorSpreads &&
+      newSpread >= 1 &&
+      newSpread <= totalInteriorSpreads &&
+      bookSpreadRef.current
+    ) {
+      if (newSpread === currentSpread + 1) {
+        bookSpreadRef.current.flipNext();
+        return;
+      } else if (newSpread === currentSpread - 1) {
+        bookSpreadRef.current.flipPrev();
+        return;
+      } else if (newSpread !== currentSpread) {
+        bookSpreadRef.current.flipToSpread(newSpread);
+        return;
+      }
     }
+
+    bookAudio.playPageTurn();
+    setCurrentSpread(newSpread);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentSpread, totalInteriorSpreads]);
 
   // Turn Next (forward)
   const handleTurnNext = useCallback(() => {
+    if (currentSpread >= 1 && currentSpread < totalInteriorSpreads && bookSpreadRef.current) {
+      bookSpreadRef.current.flipNext();
+      return;
+    }
     if (currentSpread < totalInteriorSpreads + 1) {
-      handleNavigateSpread(currentSpread + 1, 'forward');
+      handleNavigateSpread(currentSpread + 1);
     }
   }, [currentSpread, totalInteriorSpreads, handleNavigateSpread]);
 
   // Turn Prev (backward)
   const handleTurnPrev = useCallback(() => {
-    if (currentSpread > 0) {
-      handleNavigateSpread(currentSpread - 1, 'backward');
+    if (currentSpread > 1 && currentSpread <= totalInteriorSpreads && bookSpreadRef.current) {
+      bookSpreadRef.current.flipPrev();
+      return;
     }
-  }, [currentSpread, handleNavigateSpread]);
-
-  // Position-based page clicks for book interior (capped at interior boundaries):
-  // Right half click -> turn forward (capped at spread 9)
-  const handlePageClickForward = useCallback(() => {
-    if (currentSpread < totalInteriorSpreads) {
-      handleNavigateSpread(currentSpread + 1, 'forward');
+    if (currentSpread > 0) {
+      handleNavigateSpread(currentSpread - 1);
     }
   }, [currentSpread, totalInteriorSpreads, handleNavigateSpread]);
 
-  // Left half click -> turn backward (capped at spread 1)
+  // Position-based page clicks fallback (capped at interior boundaries):
+  // Left half click -> turn forward (capped at spread 9)
+  const handlePageClickForward = useCallback(() => {
+    if (currentSpread < totalInteriorSpreads) {
+      handleNavigateSpread(currentSpread + 1);
+    }
+  }, [currentSpread, totalInteriorSpreads, handleNavigateSpread]);
+
+  // Right half click -> turn backward (capped at spread 1)
   const handlePageClickBackward = useCallback(() => {
     if (currentSpread > 1) {
-      handleNavigateSpread(currentSpread - 1, 'backward');
+      handleNavigateSpread(currentSpread - 1);
     }
   }, [currentSpread, handleNavigateSpread]);
 
@@ -94,13 +115,13 @@ export function App() {
         if (selectedProject) setSelectedProject(null);
         else if (isTocOpen) setIsTocOpen(false);
         else if (isPdfAuditOpen) setIsPdfAuditOpen(false);
-        else handleNavigateSpread(0, 'backward');
+        else handleNavigateSpread(0);
       } else if (e.key === 'Home') {
         e.preventDefault();
-        handleNavigateSpread(0, 'backward');
+        handleNavigateSpread(0);
       } else if (e.key === 'End') {
         e.preventDefault();
-        handleNavigateSpread(totalInteriorSpreads + 1, 'forward');
+        handleNavigateSpread(totalInteriorSpreads + 1);
       }
     };
 
@@ -120,7 +141,7 @@ export function App() {
           /* Closed Front Hardcover */
           <div className="cover-transition w-full flex justify-center">
             <BookCover
-              onOpenBook={() => handleNavigateSpread(1, 'forward')}
+              onOpenBook={() => handleNavigateSpread(1)}
               onOpenTableOfContents={() => setIsTocOpen(true)}
               onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
             />
@@ -129,22 +150,23 @@ export function App() {
           /* Closed Back Hardcover Jacket */
           <div className="cover-transition w-full flex justify-center">
             <BookBackCover
-              onReopenBook={() => handleNavigateSpread(1, 'forward')}
-              onReturnToCover={() => handleNavigateSpread(0, 'backward')}
+              onReopenBook={() => handleNavigateSpread(1)}
+              onReturnToCover={() => handleNavigateSpread(0)}
               onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
             />
           </div>
         ) : (
-          /* Interior Two-Page Spread (Spreads 1 to 9) */
+          /* Interior Physical 3D Book Spreads (Spreads 1 to 9 / Pages 1 to 18) */
           <BookSpread
+            ref={bookSpreadRef}
             spreadIndex={currentSpread}
             onOpenProjectModal={(project) => setSelectedProject(project)}
             onSelectChapter={(spreadIdx) => handleNavigateSpread(spreadIdx)}
             onOpenPdfAudit={() => setIsPdfAuditOpen(true)}
+            onSpreadChange={(newSpreadIdx) => setCurrentSpread(newSpreadIdx)}
             onTurnPageForward={handlePageClickForward}
             onTurnPageBackward={handlePageClickBackward}
             isSinglePageMode={isSinglePageMode}
-            turnDirection={turnDirection}
           />
         )}
       </main>

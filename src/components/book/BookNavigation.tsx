@@ -1,18 +1,15 @@
 import React from 'react';
 import { portfolioData } from '../../data/portfolioData';
-import { bookAudio } from '../../utils/audioUtils';
 import { 
   ChevronLeft, 
   ChevronRight, 
   Volume2, 
   VolumeX, 
-  BookOpen, 
   ShieldCheck, 
   Columns, 
   Square,
   Home,
   Bookmark,
-  RotateCcw,
   BookMarked
 } from 'lucide-react';
 
@@ -44,25 +41,21 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
 
   // Navigation handlers
   const handleGoFrontCover = () => {
-    bookAudio.playPageTurn();
     onNavigateSpread(0);
   };
 
   const handleGoBackCover = () => {
-    bookAudio.playPageTurn();
     onNavigateSpread(totalSpreads + 1);
   };
 
   const handlePrevPage = () => {
     if (currentSpread > 0) {
-      bookAudio.playPageTurn();
       onNavigateSpread(currentSpread - 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentSpread < totalSpreads + 1) {
-      bookAudio.playPageTurn();
       onNavigateSpread(currentSpread + 1);
     }
   };
