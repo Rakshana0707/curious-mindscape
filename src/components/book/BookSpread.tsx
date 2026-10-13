@@ -315,10 +315,25 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
       </div>
 
       {/* Actions */}
-      <div className="pt-2 border-t border-amber-900/15 flex items-center justify-between text-xs">
-        <span className="font-mono text-[10px] text-emerald-800 font-medium">
-          Status: {project.status}
-        </span>
+      <div className="pt-2 border-t border-amber-900/15 flex items-center justify-between text-xs gap-2">
+        {project.githubUrl ? (
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-stone-900 hover:bg-stone-800 text-stone-100 font-mono text-[10px] transition-colors interactive-element"
+            title={`Open ${project.title} GitHub repository`}
+          >
+            <GitHubIcon className="w-3 h-3 text-amber-400" />
+            <span>Repository</span>
+            <ExternalLink className="w-2.5 h-2.5 text-stone-400" />
+          </a>
+        ) : (
+          <span className="font-mono text-[10px] text-emerald-800 font-medium">
+            Status: {project.status}
+          </span>
+        )}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -494,10 +509,6 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
                   </span>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-3 p-3 bg-amber-50/60 rounded border border-amber-900/10 text-xs font-garamond italic text-stone-700">
-              Tip: Click the <strong>left half</strong> of the open book to return to the previous spread, or the <strong>right half</strong> to advance to the next spread.
             </div>
           </div>
         );

@@ -289,7 +289,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 2",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/GlobalPulse"
     },
     {
       id: "campcon",
@@ -320,7 +320,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 2",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/CampCon"
     },
     {
       id: "zyatra",
@@ -351,7 +351,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 1",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/Zyatra"
     },
     {
       id: "civiclenstn",
@@ -382,7 +382,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 1",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/CIVICLENS"
     },
     {
       id: "contextiq",
@@ -413,7 +413,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 1",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/ContextIQ"
     },
     {
       id: "microdelay",
@@ -444,7 +444,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 1",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/MicroDelay"
     },
     {
       id: "skillsync",
@@ -475,7 +475,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 2",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/SkillSync"
     },
     {
       id: "lifelink",
@@ -506,7 +506,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 2",
       status: "Verified Completed Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/LifeLink"
     },
     {
       id: "grainly",
@@ -537,7 +537,7 @@ export const portfolioData = {
       ],
       sourcePdf: "PDF 2",
       status: "Systems Architecture Project",
-      githubUrl: "https://github.com/Rakshana0707"
+      githubUrl: "https://github.com/Rakshana0707/Grainly"
     }
   ] as Project[],
 
