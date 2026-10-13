@@ -243,7 +243,7 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
           ) : (
             <div className="flex flex-col items-center">
               <span className="text-[11px] sm:text-xs font-cinzel font-bold text-amber-200 tracking-wide">
-                Pages {currentSpread * 2 - 1} & {currentSpread * 2} of 18
+                Pages {currentSpread * 2 - 1} & {currentSpread * 2} of {totalSpreads * 2}
               </span>
               <span className="text-[9px] font-mono text-stone-400">
                 Spread {currentSpread} of {totalSpreads}

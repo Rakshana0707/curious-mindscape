@@ -12,8 +12,8 @@ import { bookAudio } from './utils/audioUtils';
 export function App() {
   // Navigation State:
   // 0 = Closed Front Hardcover
-  // 1..9 = Interior Two-Page Spreads (Pages 1 to 18)
-  // 10 = Closed Back Hardcover Jacket
+  // 1..8 = Interior Two-Page Spreads (Pages 1 to 16)
+  // 9 = Closed Back Hardcover Jacket
   const [currentSpread, setCurrentSpread] = useState<number>(0);
   const bookSpreadRef = useRef<BookSpreadHandle | null>(null);
 
@@ -24,7 +24,7 @@ export function App() {
   const [isSinglePageMode, setIsSinglePageMode] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(bookAudio.getMuted());
 
-  const totalInteriorSpreads = 9;
+  const totalInteriorSpreads = 8;
 
   // Single consistent spread navigation handler
   const handleNavigateSpread = useCallback((newSpread: number) => {

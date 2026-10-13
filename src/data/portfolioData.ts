@@ -238,32 +238,22 @@ export const portfolioData = {
       category: "projects"
     },
     {
-      id: "case-studies",
-      roman: "V",
-      title: "Featured Case Studies",
-      subtitle: "Grainly IPC Architecture & MicroDelay ML Pipeline",
-      spreadIndex: 7,
-      pages: [13, 14],
-      description: "In-depth engineering narratives with 6 concise architectural sections.",
-      category: "case-studies"
-    },
-    {
       id: "experience",
-      roman: "VI",
+      roman: "V",
       title: "Experience, Honors & Certifications",
       subtitle: "Hackathons, Leadership & Qualifications",
-      spreadIndex: 8,
-      pages: [15, 16],
+      spreadIndex: 7,
+      pages: [13, 14],
       description: "Rac-a-thon Special Mention, SIH participant, Rotaract Chairperson, and Simplilearn certifications.",
       category: "experience"
     },
     {
       id: "contact",
-      roman: "VII",
+      roman: "VI",
       title: "Final Contact Spread",
       subtitle: "Closing Message & Live Correspondence Form",
-      spreadIndex: 9,
-      pages: [17, 18],
+      spreadIndex: 8,
+      pages: [15, 16],
       description: "Working contact dispatch form, source PDF audit transparency, and verified links.",
       category: "contact"
     }

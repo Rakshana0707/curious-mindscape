@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import HTMLFlipBook from 'react-pageflip';
-import { portfolioData, Project, CaseStudy } from '../../data/portfolioData';
+import { portfolioData, Project } from '../../data/portfolioData';
 import { ContactBookForm } from './ContactBookForm';
 import { bookAudio } from '../../utils/audioUtils';
 import { 
@@ -13,7 +13,6 @@ import {
   Sparkles,
   MapPin,
   CheckCircle2,
-  Lightbulb,
 } from 'lucide-react';
 import { GitHubIcon, LinkedInIcon } from '../BrandIcons';
 
@@ -55,8 +54,8 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
       : false
   );
 
-  const totalInteriorSpreads = 9;
-  const totalPages = 18;
+  const totalInteriorSpreads = 8;
+  const totalPages = 16;
 
   // Track viewport size and reduced-motion preference
   useEffect(() => {
@@ -334,109 +333,7 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
     </div>
   );
 
-  // Helper for rendering structured 6-section case studies
-  const renderCaseStudyPage = (study: CaseStudy) => (
-    <div className="space-y-2.5">
-      <div className="border-b border-amber-900/15 pb-1.5">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-cinzel font-bold text-amber-900 uppercase tracking-widest">
-            FEATURED CASE STUDY
-          </span>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-semibold border border-amber-300">
-            p. {study.pageNumber}
-          </span>
-        </div>
-        <h3 className="font-cinzel font-bold text-base sm:text-lg text-stone-900 mt-0.5">
-          {study.title}
-        </h3>
-        <p className="text-xs font-garamond italic text-stone-600">
-          {study.subtitle}
-        </p>
-      </div>
-
-      {/* 1. Problem */}
-      <div className="p-2 bg-white/70 rounded border border-amber-900/10 text-xs font-serif">
-        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-0.5">
-          1. Problem Statement
-        </span>
-        <p className="text-stone-700 leading-relaxed">{study.problem}</p>
-      </div>
-
-      {/* 2. Requirements and Constraints */}
-      <div className="p-2 bg-white/70 rounded border border-amber-900/10 text-xs font-serif">
-        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-1">
-          2. Requirements & Constraints
-        </span>
-        <ul className="space-y-0.5 text-[11px] text-stone-700">
-          {study.requirementsAndConstraints.map((rc, idx) => (
-            <li key={idx} className="flex items-start gap-1.5">
-              <span className="text-amber-800 font-bold shrink-0">•</span>
-              <span>{rc}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* 3. Approach and Design Decisions */}
-      <div className="p-2 bg-white/70 rounded border border-amber-900/10 text-xs font-serif">
-        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-1">
-          3. Approach & Design Decisions
-        </span>
-        <ul className="space-y-0.5 text-[11px] text-stone-700">
-          {study.approachAndDecisions.map((ad, idx) => (
-            <li key={idx} className="flex items-start gap-1.5">
-              <span className="text-amber-800 font-bold shrink-0">•</span>
-              <span>{ad}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* 4. Technologies Used */}
-      <div className="px-2.5 py-1.5 bg-stone-100/80 rounded border border-stone-200 text-xs">
-        <span className="font-cinzel font-bold text-stone-900 text-[10px] uppercase tracking-wider block mb-1">
-          4. Technologies Used
-        </span>
-        <div className="flex flex-wrap gap-1">
-          {study.technologies.map(t => (
-            <span key={t} className="px-1.5 py-0.5 bg-white rounded text-[10px] font-mono text-stone-800 border border-stone-300">
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* 5. Implementation Details and Outcomes */}
-      <div className="p-2 bg-emerald-50/50 rounded border border-emerald-900/15 text-xs font-serif">
-        <span className="font-cinzel font-bold text-emerald-950 block text-[11px] mb-1">
-          5. Implementation Details & Verified Outcomes
-        </span>
-        <ul className="space-y-0.5 text-[11px] text-stone-700">
-          {[...study.implementation, ...study.verifiedOutcome].map((io, idx) => (
-            <li key={idx} className="flex items-start gap-1.5">
-              <CheckCircle2 className="w-3 h-3 text-emerald-700 shrink-0 mt-0.5" />
-              <span>{io}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* 6. Potential Future Improvements */}
-      <div className="p-2 bg-amber-50/70 rounded border border-amber-800/20 text-xs font-serif">
-        <span className="font-cinzel font-bold text-amber-950 block text-[11px] mb-0.5 flex items-center gap-1">
-          <Lightbulb className="w-3.5 h-3.5 text-amber-700" />
-          <span>6. Potential Future Improvements (Roadmap)</span>
-        </span>
-        <ul className="space-y-0.5 text-[11px] text-stone-700 italic">
-          {study.futureImprovements.map((fi, idx) => (
-            <li key={idx}>• {fi}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-
-  // Render content for a specific 1-indexed page number (1 to 18)
+  // Render content for a specific 1-indexed page number (1 to 16)
   const renderPageContent = (pageNum: number) => {
     switch (pageNum) {
       case 1:
@@ -703,18 +600,14 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
         return renderProjectPage(portfolioData.projects.find(p => p.id === 'skillsync')!);
       case 12:
         return renderProjectPage(portfolioData.projects.find(p => p.id === 'lifelink')!);
-      case 13:
-        return renderCaseStudyPage(portfolioData.caseStudies[0]);
-      case 14:
-        return renderCaseStudyPage(portfolioData.caseStudies[1]);
 
-      case 15:
-        /* Page 15 (Spread 8 Left): Hackathons & Honors */
+      case 13:
+        /* Page 13 (Spread 7 Left): Hackathons & Honors */
         return (
           <div className="space-y-4">
             <div className="mb-2">
               <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                CHAPTER VI • TRACK RECORD & HONORS
+                CHAPTER V • TRACK RECORD & HONORS
               </span>
               <h3 className="font-cinzel text-xl font-bold text-stone-900">
                 Competitive Hackathons
@@ -762,13 +655,13 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
           </div>
         );
 
-      case 16:
-        /* Page 16 (Spread 8 Right): Leadership & Certifications */
+      case 14:
+        /* Page 14 (Spread 7 Right): Leadership & Certifications */
         return (
           <div className="space-y-4">
             <div className="mb-2">
               <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                CHAPTER VI • COMMUNITY & RECOGNITION
+                CHAPTER V • COMMUNITY & RECOGNITION
               </span>
               <h3 className="font-cinzel text-xl font-bold text-stone-900">
                 Leadership & Certifications
@@ -816,13 +709,13 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
           </div>
         );
 
-      case 17:
-        /* Page 17 (Spread 9 Left): Closing Message & Coordinates */
+      case 15:
+        /* Page 15 (Spread 8 Left): Closing Message & Coordinates */
         return (
           <div className="space-y-4">
             <div className="mb-2">
               <span className="text-[10px] font-cinzel text-amber-900 uppercase tracking-widest font-semibold">
-                CHAPTER VII • FINAL CONTACT SPREAD
+                CHAPTER VI • FINAL CONTACT SPREAD
               </span>
               <h3 className="font-cinzel text-xl font-bold text-stone-900">
                 Closing Message & Coordinates
@@ -913,8 +806,8 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
           </div>
         );
 
-      case 18:
-        /* Page 18 (Spread 9 Right): Working Contact Form */
+      case 16:
+        /* Page 16 (Spread 8 Right): Working Contact Form */
         return (
           <div>
             <div className="mb-2">

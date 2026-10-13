@@ -92,19 +92,13 @@ export const TableOfContentsModal: React.FC<TableOfContentsModalProps> = ({
               onClick={() => { onSelectChapter(7); onClose(); }}
               className="px-2.5 py-1 rounded text-xs font-cinzel font-semibold bg-white hover:bg-amber-100 border border-amber-900/20 text-stone-900 transition-colors cursor-pointer"
             >
-              Case Studies (p. 13)
+              Experience (p. 13)
             </button>
             <button
               onClick={() => { onSelectChapter(8); onClose(); }}
               className="px-2.5 py-1 rounded text-xs font-cinzel font-semibold bg-white hover:bg-amber-100 border border-amber-900/20 text-stone-900 transition-colors cursor-pointer"
             >
-              Experience (p. 15)
-            </button>
-            <button
-              onClick={() => { onSelectChapter(9); onClose(); }}
-              className="px-2.5 py-1 rounded text-xs font-cinzel font-semibold bg-white hover:bg-amber-100 border border-amber-900/20 text-stone-900 transition-colors cursor-pointer"
-            >
-              Contact Form (p. 18)
+              Contact Form (p. 16)
             </button>
           </div>
         </div>
