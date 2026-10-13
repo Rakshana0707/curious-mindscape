@@ -78,14 +78,14 @@ export function App() {
   }, [currentSpread, totalInteriorSpreads, handleNavigateSpread]);
 
   // Position-based page clicks fallback (capped at interior boundaries):
-  // Left half click -> turn forward (capped at spread 9)
+  // Right half click -> turn forward (capped at spread 9)
   const handlePageClickForward = useCallback(() => {
     if (currentSpread < totalInteriorSpreads) {
       handleNavigateSpread(currentSpread + 1);
     }
   }, [currentSpread, totalInteriorSpreads, handleNavigateSpread]);
 
-  // Right half click -> turn backward (capped at spread 1)
+  // Left half click -> turn backward (capped at spread 1)
   const handlePageClickBackward = useCallback(() => {
     if (currentSpread > 1) {
       handleNavigateSpread(currentSpread - 1);

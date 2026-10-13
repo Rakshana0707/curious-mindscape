@@ -199,8 +199,8 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
   };
 
   // Position-based Click Rules:
-  // Clicking the LEFT half of the open book -> Advances to the NEXT page or spread
-  // Clicking the RIGHT half of the open book -> Moves to the PREVIOUS page or spread
+  // Clicking the LEFT half of the open book -> Turns BACKWARD to the PREVIOUS page or spread
+  // Clicking the RIGHT half of the open book -> Turns FORWARD to the NEXT page or spread
   const isInteractiveClickOrSelection = (e: React.MouseEvent): boolean => {
     const selection = window.getSelection();
     if (selection && selection.toString().trim().length > 0) return true;
@@ -218,23 +218,23 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
 
   const handleLeftHalfClick = (e: React.MouseEvent) => {
     if (isInteractiveClickOrSelection(e) || isFlipping) return;
-    triggerPhysicalNext();
+    triggerPhysicalPrev();
   };
 
   const handleRightHalfClick = (e: React.MouseEvent) => {
     if (isInteractiveClickOrSelection(e) || isFlipping) return;
-    triggerPhysicalPrev();
+    triggerPhysicalNext();
   };
 
-  // Single-page mode click handler: left half of single page advances next, right half moves previous
+  // Single-page mode click handler: left half of single page moves previous, right half advances next
   const handleSinglePageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isInteractiveClickOrSelection(e) || isFlipping) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     if (clickX < rect.width / 2) {
-      triggerPhysicalNext();
-    } else {
       triggerPhysicalPrev();
+    } else {
+      triggerPhysicalNext();
     }
   };
 
@@ -600,7 +600,7 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
             </div>
 
             <div className="mt-3 p-3 bg-amber-50/60 rounded border border-amber-900/10 text-xs font-garamond italic text-stone-700">
-              Tip: Click the <strong>left half</strong> of the open book to advance to the next spread, or the <strong>right half</strong> to return to the previous spread.
+              Tip: Click the <strong>left half</strong> of the open book to return to the previous spread, or the <strong>right half</strong> to advance to the next spread.
             </div>
           </div>
         );
@@ -1018,17 +1018,17 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
                   }`}
                   title={
                     isLeftPage
-                      ? pageSpreadIdx < totalInteriorSpreads
-                        ? 'Click left half to turn forward (Next page)'
-                        : 'Final interior spread'
-                      : pageSpreadIdx > 1
-                      ? 'Click right half to turn backward (Previous page)'
-                      : 'First interior spread'
+                      ? pageSpreadIdx > 1
+                        ? 'Click left half to turn backward (Previous page)'
+                        : 'First interior spread'
+                      : pageSpreadIdx < totalInteriorSpreads
+                      ? 'Click right half to turn forward (Next page)'
+                      : 'Final interior spread'
                   }
                   aria-label={
                     isLeftPage
-                      ? 'Click left half of the open book to advance to the next page'
-                      : 'Click right half of the open book to move to the previous page'
+                      ? 'Click left half of the open book to move to the previous page'
+                      : 'Click right half of the open book to advance to the next page'
                   }
                 >
                   {/* Subtle Edge Glow Hover Cue */}
@@ -1039,15 +1039,15 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
                   )}
 
                   {/* Floating Edge Tooltip Indicator on Hover */}
-                  {isLeftPage && pageSpreadIdx < totalInteriorSpreads && (
+                  {isLeftPage && pageSpreadIdx > 1 && (
                     <div className="absolute left-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover/left:opacity-100 transition-all pointer-events-none bg-stone-950/90 text-amber-200 text-[10px] font-cinzel font-bold px-2 py-1 rounded shadow-lg border border-amber-500/40 flex items-center gap-1 z-30 select-none">
-                      <span>Next page ➔</span>
+                      <span>⬅ Previous page</span>
                     </div>
                   )}
 
-                  {!isLeftPage && pageSpreadIdx > 1 && (
+                  {!isLeftPage && pageSpreadIdx < totalInteriorSpreads && (
                     <div className="absolute right-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover/right:opacity-100 transition-all pointer-events-none bg-stone-950/90 text-amber-200 text-[10px] font-cinzel font-bold px-2 py-1 rounded shadow-lg border border-amber-500/40 flex items-center gap-1 z-30 select-none">
-                      <span>⬅ Previous page</span>
+                      <span>Next page ➔</span>
                     </div>
                   )}
 
@@ -1086,23 +1086,6 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
                         <span
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (pageSpreadIdx < totalInteriorSpreads) triggerPhysicalNext();
-                          }}
-                          className={`flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element ${
-                            pageSpreadIdx < totalInteriorSpreads
-                              ? 'hover:text-amber-900 cursor-pointer'
-                              : 'opacity-40 cursor-default'
-                          }`}
-                          title="Turn forward to next spread"
-                        >
-                          Next Page ▶
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <span
-                          onClick={(e) => {
-                            e.stopPropagation();
                             if (pageSpreadIdx > 1) triggerPhysicalPrev();
                           }}
                           className={`flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element ${
@@ -1113,6 +1096,23 @@ export const BookSpread = forwardRef<BookSpreadHandle, BookSpreadProps>(({
                           title="Turn backward to previous spread"
                         >
                           ◀ Previous Page
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (pageSpreadIdx < totalInteriorSpreads) triggerPhysicalNext();
+                          }}
+                          className={`flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element ${
+                            pageSpreadIdx < totalInteriorSpreads
+                              ? 'hover:text-amber-900 cursor-pointer'
+                              : 'opacity-40 cursor-default'
+                          }`}
+                          title="Turn forward to next spread"
+                        >
+                          Next Page ▶
                         </span>
                         <span className="font-bold">p. {pageNum}</span>
                       </>
