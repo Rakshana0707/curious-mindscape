@@ -74,26 +74,8 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
   };
 
   // Position-based Click Handlers:
-  // Left half click -> Turn FORWARD
+  // Left half click -> Turn BACKWARD (Previous page)
   const handleLeftPageClick = (e: React.MouseEvent) => {
-    // 1. If text is selected, do not trigger page flip
-    const selection = window.getSelection();
-    if (selection && selection.toString().trim().length > 0) return;
-
-    // 2. If click was inside an interactive control, do not turn
-    const target = e.target as HTMLElement;
-    if (target.closest('button, a, input, textarea, select, [role="button"], label, .interactive-element')) {
-      return;
-    }
-
-    // 3. Prevent moving beyond last interior spread
-    if (spreadIndex < totalInteriorSpreads) {
-      onTurnPageForward();
-    }
-  };
-
-  // Right half click -> Turn BACKWARD
-  const handleRightPageClick = (e: React.MouseEvent) => {
     // 1. If text is selected, do not trigger page flip
     const selection = window.getSelection();
     if (selection && selection.toString().trim().length > 0) return;
@@ -107,6 +89,24 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
     // 3. Prevent moving beyond first interior spread
     if (spreadIndex > 1) {
       onTurnPageBackward();
+    }
+  };
+
+  // Right half click -> Turn FORWARD (Next page)
+  const handleRightPageClick = (e: React.MouseEvent) => {
+    // 1. If text is selected, do not trigger page flip
+    const selection = window.getSelection();
+    if (selection && selection.toString().trim().length > 0) return;
+
+    // 2. If click was inside an interactive control, do not turn
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, textarea, select, [role="button"], label, .interactive-element')) {
+      return;
+    }
+
+    // 3. Prevent moving beyond last interior spread
+    if (spreadIndex < totalInteriorSpreads) {
+      onTurnPageForward();
     }
   };
 
@@ -316,23 +316,23 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
       }`}>
         
         {/* =========================================================================
-            LEFT PAGE (VERSO) — CLICK TO TURN FORWARD
+            LEFT PAGE (VERSO) — CLICK TO TURN BACKWARD
             ========================================================================= */}
         <div 
           onClick={handleLeftPageClick}
           className={`relative flex-1 p-6 sm:p-8 lg:p-10 parchment-sheet edge-stack-left flex flex-col justify-between border-b md:border-b-0 md:border-r border-amber-900/15 page-verso-interactive group/left cursor-pointer transition-colors ${
             isSinglePageMode ? 'hidden md:flex' : 'flex'
           }`}
-          title={spreadIndex < totalInteriorSpreads ? "Click left half to turn forward (Next page)" : "Final interior spread"}
-          aria-label="Click left half of the book to advance forward"
+          title={spreadIndex > 1 ? "Click left half to turn backward (Previous page)" : "First interior spread"}
+          aria-label="Click left half of the book to turn backward"
         >
           {/* Subtle Left Edge Glow Hover Cue */}
           <div className="page-edge-glow-left" />
 
           {/* Floating Edge Tooltip Indicator on Hover */}
-          {spreadIndex < totalInteriorSpreads && (
+          {spreadIndex > 1 && (
             <div className="absolute left-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover/left:opacity-100 transition-all pointer-events-none bg-stone-950/90 text-amber-200 text-[10px] font-cinzel font-bold px-2 py-1 rounded shadow-lg border border-amber-500/40 flex items-center gap-1 z-30 select-none">
-              <span>Next page ➔</span>
+              <span>⬅ Previous page</span>
             </div>
           )}
           
@@ -644,12 +644,14 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
             <span 
               onClick={(e) => {
                 e.stopPropagation();
-                if (spreadIndex < totalInteriorSpreads) onTurnPageForward();
+                if (spreadIndex > 1) onTurnPageBackward();
               }}
-              className="hover:text-amber-900 cursor-pointer flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element"
-              title="Turn forward to next spread"
+              className={`flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element ${
+                spreadIndex > 1 ? 'hover:text-amber-900 cursor-pointer' : 'opacity-40 cursor-default'
+              }`}
+              title="Turn backward to previous spread"
             >
-              Next Page ▶
+              ◀ Previous Page
             </span>
           </div>
 
@@ -665,21 +667,21 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
 
 
         {/* =========================================================================
-            RIGHT PAGE (RECTO) — CLICK TO TURN BACKWARD
+            RIGHT PAGE (RECTO) — CLICK TO TURN FORWARD
             ========================================================================= */}
         <div 
           onClick={handleRightPageClick}
           className="relative flex-1 p-6 sm:p-8 lg:p-10 parchment-sheet edge-stack-right flex flex-col justify-between page-recto-interactive group/right cursor-pointer transition-colors"
-          title={spreadIndex > 1 ? "Click right half to turn backward (Previous page)" : "First interior spread"}
-          aria-label="Click right half of the book to turn backward"
+          title={spreadIndex < totalInteriorSpreads ? "Click right half to turn forward (Next page)" : "Final interior spread"}
+          aria-label="Click right half of the book to advance forward"
         >
           {/* Subtle Right Edge Glow Hover Cue */}
           <div className="page-edge-glow-right" />
 
           {/* Floating Edge Tooltip Indicator on Hover */}
-          {spreadIndex > 1 && (
+          {spreadIndex < totalInteriorSpreads && (
             <div className="absolute right-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover/right:opacity-100 transition-all pointer-events-none bg-stone-950/90 text-amber-200 text-[10px] font-cinzel font-bold px-2 py-1 rounded shadow-lg border border-amber-500/40 flex items-center gap-1 z-30 select-none">
-              <span>⬅ Previous page</span>
+              <span>Next page ➔</span>
             </div>
           )}
 
@@ -941,12 +943,14 @@ export const BookSpread: React.FC<BookSpreadProps> = ({
             <span 
               onClick={(e) => {
                 e.stopPropagation();
-                if (spreadIndex > 1) onTurnPageBackward();
+                if (spreadIndex < totalInteriorSpreads) onTurnPageForward();
               }}
-              className="hover:text-amber-900 cursor-pointer flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element"
-              title="Turn backward to previous spread"
+              className={`flex items-center gap-1 font-cinzel text-[11px] font-semibold interactive-element ${
+                spreadIndex < totalInteriorSpreads ? 'hover:text-amber-900 cursor-pointer' : 'opacity-40 cursor-default'
+              }`}
+              title="Turn forward to next spread"
             >
-              ◀ Previous Page
+              Next Page ▶
             </span>
             <span className="font-bold">p. {rightPageNum}</span>
           </div>
