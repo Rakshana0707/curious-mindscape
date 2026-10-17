@@ -8,6 +8,7 @@ import { TableOfContentsModal } from './components/book/TableOfContentsModal';
 import { PdfVerificationModal } from './components/book/PdfVerificationModal';
 import { ProjectDetailModal } from './components/book/ProjectDetailModal';
 import { bookAudio } from './utils/audioUtils';
+import { bookNarrator } from './utils/narratorUtils';
 
 export function App() {
   // Navigation State:
@@ -23,6 +24,7 @@ export function App() {
   const [isPdfAuditOpen, setIsPdfAuditOpen] = useState<boolean>(false);
   const [isSinglePageMode, setIsSinglePageMode] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(bookAudio.getMuted());
+  const [isNarrating, setIsNarrating] = useState<boolean>(false);
 
   const totalInteriorSpreads = 8;
 
@@ -96,6 +98,43 @@ export function App() {
     const nextMuted = bookAudio.toggleMute();
     setIsMuted(nextMuted);
   };
+
+  const handleToggleNarrator = useCallback(() => {
+    setIsNarrating((prev) => {
+      if (prev) {
+        bookNarrator.stop();
+        return false;
+      }
+      return true;
+    });
+  }, []);
+
+  // Audio Narrator: Recite current page and auto-turn on completion
+  useEffect(() => {
+    if (!isNarrating || isTocOpen || selectedProject || isPdfAuditOpen) {
+      bookNarrator.stop();
+      return;
+    }
+
+    const script = bookNarrator.getScriptForSpread(currentSpread);
+    if (!script) {
+      setIsNarrating(false);
+      return;
+    }
+
+    bookNarrator.speak(script, () => {
+      // Auto-turn to next spread if not on the back cover
+      if (currentSpread < totalInteriorSpreads + 1) {
+        handleTurnNext();
+      } else {
+        setIsNarrating(false);
+      }
+    });
+
+    return () => {
+      bookNarrator.stop();
+    };
+  }, [currentSpread, isNarrating, isTocOpen, selectedProject, isPdfAuditOpen, totalInteriorSpreads, handleTurnNext]);
 
   // Keyboard navigation listener (Left, Right, Escape, Home, End)
   useEffect(() => {
@@ -182,6 +221,8 @@ export function App() {
         onToggleSinglePageMode={() => setIsSinglePageMode(!isSinglePageMode)}
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
+        isNarrating={isNarrating}
+        onToggleNarrator={handleToggleNarrator}
       />
 
       {/* Interactive Modals */}

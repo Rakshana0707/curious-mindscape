@@ -10,11 +10,14 @@ import {
   Square,
   Home,
   Bookmark,
-  BookMarked
+  BookMarked,
+  Mic,
+  MicOff,
+  Headphones
 } from 'lucide-react';
 
 interface BookNavigationProps {
-  currentSpread: number; // 0 = Cover, 1..9 = Interior Spreads 1-9, 10 = Back Cover
+  currentSpread: number; // 0 = Cover, 1..8 = Interior Spreads 1-8, 9 = Back Cover
   totalSpreads: number;
   onNavigateSpread: (index: number) => void;
   onOpenTableOfContents: () => void;
@@ -23,6 +26,8 @@ interface BookNavigationProps {
   onToggleSinglePageMode: () => void;
   isMuted: boolean;
   onToggleMute: () => void;
+  isNarrating: boolean;
+  onToggleNarrator: () => void;
 }
 
 export const BookNavigation: React.FC<BookNavigationProps> = ({
@@ -35,6 +40,8 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
   onToggleSinglePageMode,
   isMuted,
   onToggleMute,
+  isNarrating,
+  onToggleNarrator,
 }) => {
   const isCover = currentSpread === 0;
   const isBack = currentSpread === totalSpreads + 1;
@@ -161,8 +168,32 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
           </button>
         </div>
 
-        {/* Right: Audio Sound, View Mode & Audit Trigger */}
+        {/* Right: Audio Narration, Sound, View Mode & Audit Trigger */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Audio Recite / Auto-Read Voice Toggle */}
+          <button
+            onClick={onToggleNarrator}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-cinzel transition-all cursor-pointer ${
+              isNarrating
+                ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-sm animate-pulse'
+                : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-stone-300 hover:text-amber-200'
+            }`}
+            title={isNarrating ? 'Stop Auto-Recite Narration' : 'Start Auto-Recite: Read page aloud and auto-turn'}
+            aria-label="Toggle Auto-Recite Voice Narration"
+          >
+            {isNarrating ? (
+              <>
+                <Headphones className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
+                <span className="hidden sm:inline font-semibold">Reading Aloud...</span>
+              </>
+            ) : (
+              <>
+                <Headphones className="w-3.5 h-3.5 text-stone-400" />
+                <span className="hidden sm:inline">Read Aloud</span>
+              </>
+            )}
+          </button>
+
           {/* Sound Mute/Unmute */}
           <button
             onClick={onToggleMute}
@@ -275,6 +306,21 @@ export const BookNavigation: React.FC<BookNavigationProps> = ({
         >
           <Bookmark className="w-4 h-4 text-amber-400" />
           <span className="text-[11px] font-cinzel hidden sm:inline">Index</span>
+        </button>
+
+        <div className="h-4 w-[1px] bg-zinc-800" />
+
+        {/* Read Aloud / Auto-Recite Trigger */}
+        <button
+          onClick={onToggleNarrator}
+          className={`flex items-center gap-1 px-2 py-1.5 rounded-lg transition-colors cursor-pointer ${
+            isNarrating ? 'bg-amber-950 text-amber-300 font-bold animate-pulse' : 'hover:bg-zinc-800 text-stone-300 hover:text-amber-200'
+          }`}
+          title={isNarrating ? 'Stop Auto-Recite Narration' : 'Read Page Aloud & Auto-Turn'}
+          aria-label="Read Aloud Voice Narration"
+        >
+          <Headphones className={`w-4 h-4 ${isNarrating ? 'text-amber-400 animate-bounce' : 'text-stone-400'}`} />
+          <span className="text-[11px] font-cinzel hidden sm:inline">{isNarrating ? 'Reading...' : 'Recite'}</span>
         </button>
 
         <div className="h-4 w-[1px] bg-zinc-800" />
